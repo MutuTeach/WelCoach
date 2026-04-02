@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WelCoach — Weltrade IB Coach</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #080c14;
+    color: #e8e6de;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── SETUP SCREEN ── */
+  #setupScreen {
+    flex: 1; display: flex; align-items: center;
+    justify-content: center; padding: 24px;
+  }
+  .setup-card {
+    background: #0d1220; border: 1px solid #1a2a4a;
+    border-radius: 20px; padding: 36px;
+    max-width: 440px; width: 100%; text-align: center;
+  }
+  .setup-logo-wrap { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
+  .setup-wt-logo {
+    height: 32px; filter: brightness(0) invert(1);
+  }
+  .setup-divider { width: 1px; height: 28px; background: #2a3050; }
+  .setup-brand { font-size: 22px; font-weight: 700; color: #fff; }
+  .setup-brand span { color: #00c6ff; }
+  .setup-card .tagline { font-size: 12px; color: #4a5580; margin-bottom: 24px; margin-top: 4px; }
+  .setup-card label { display: block; text-align: left; font-size: 12px; color: #7a85aa; margin-bottom: 6px; }
+  .lang-toggle {
+    display: flex; gap: 8px; margin-bottom: 20px;
+  }
+  .lang-btn {
+    flex: 1; padding: 9px; border-radius: 8px;
+    border: 1px solid #1a2a4a; background: #080c14;
+    color: #7a85aa; font-size: 13px; cursor: pointer;
+    transition: all .15s;
+  }
+  .lang-btn.active {
+    background: #0d2040; border-color: #0072ff66;
+    color: #00c6ff; font-weight: 600;
+  }
+  .setup-card input {
+    width: 100%; background: #080c14; border: 1px solid #1a2a4a;
+    border-radius: 10px; color: #e8e6de; font-size: 13px;
+    padding: 12px 14px; outline: none; transition: border-color .15s;
+    margin-bottom: 12px; font-family: monospace; letter-spacing: 1px;
+  }
+  .setup-card input:focus { border-color: #0072ff66; }
+  .setup-card input::placeholder { color: #2a3050; letter-spacing: 0; font-family: inherit; }
+  .setup-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border: none; border-radius: 10px; color: #fff;
+    font-size: 15px; font-weight: 600; padding: 13px;
+    cursor: pointer; transition: opacity .15s;
+    box-shadow: 0 4px 16px #0072ff33;
+  }
+  .setup-btn:hover { opacity: .88; }
+  .setup-error {
+    background: #1a0d0d; border: 1px solid #4a1a1a;
+    border-radius: 8px; color: #ff6b6b; font-size: 12px;
+    padding: 10px 12px; margin-bottom: 12px; display: none; text-align: left;
+  }
+  .setup-hint { font-size: 11px; color: #2a3050; margin-top: 14px; line-height: 1.7; }
+  .setup-hint a { color: #4a7fff; text-decoration: none; }
+  .setup-hint a:hover { text-decoration: underline; }
+  .by-credit { font-size: 12px; color: #4a5580; margin-top: 20px; letter-spacing: 1px; }
+
+  /* ── MAIN APP ── */
+  #mainApp { display: none; flex-direction: column; flex: 1; }
+
+  .header {
+    background: #0d1220; border-bottom: 1px solid #1a2035;
+    padding: 12px 24px; display: flex; align-items: center; gap: 14px;
+  }
+  .header-logo { display: flex; align-items: center; gap: 10px; }
+  .wt-logo-img { height: 28px; filter: brightness(0) invert(1); opacity: .9; }
+  .logo-sep { width: 1px; height: 24px; background: #2a3050; }
+  .welcoach-brand { font-size: 17px; font-weight: 700; color: #fff; }
+  .welcoach-brand span { color: #00c6ff; }
+  .header-sub { font-size: 11px; color: #4a5580; margin-top: 1px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .online-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: #0d1220; border: 1px solid #1a2035;
+    border-radius: 20px; padding: 4px 10px; font-size: 11px; color: #3dd68c;
+  }
+  .online-dot { width: 6px; height: 6px; background: #3dd68c; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .lang-switch-btn {
+    background: #0d1220; border: 1px solid #1a2035;
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 11px; color: #7a85aa; cursor: pointer; transition: all .15s;
+  }
+  .lang-switch-btn:hover { border-color: #00c6ff44; color: #00c6ff; }
+  .reset-btn {
+    background: none; border: 1px solid #1a2035;
+    border-radius: 8px; color: #4a5580;
+    font-size: 11px; padding: 4px 10px; cursor: pointer; transition: all .15s;
+  }
+  .reset-btn:hover { border-color: #ff4a4a44; color: #ff6b6b; }
+
+  .chat-area {
+    flex: 1; overflow-y: auto; padding: 24px 16px 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    max-width: 780px; width: 100%; margin: 0 auto;
+  }
+
+  .welcome-card {
+    background: linear-gradient(135deg, #0d1830, #0a1525);
+    border: 1px solid #1a2a4a; border-radius: 16px; padding: 22px;
+  }
+  .wc-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .wc-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0; box-shadow: 0 0 16px #0072ff33;
+  }
+  .wc-title { font-size: 17px; font-weight: 700; color: #fff; }
+  .wc-title span { color: #00c6ff; }
+  .wc-subtitle { font-size: 13px; color: #7a85aa; line-height: 1.6; margin-bottom: 16px; }
+  .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .topic-btn {
+    background: #0d1220; border: 1px solid #1a2a4a; border-radius: 10px;
+    padding: 10px 14px; cursor: pointer; text-align: left; transition: all .18s;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .topic-btn:hover { background: #111827; border-color: #00c6ff44; }
+  .topic-btn .icon { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
+  .topic-btn .ttext { display: flex; flex-direction: column; gap: 2px; }
+  .topic-btn .ttext strong { font-size: 12px; font-weight: 600; color: #c8d0e8; }
+  .topic-btn .ttext span { font-size: 11px; color: #4a5580; }
+
+  .msg { display: flex; gap: 10px; animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+  .msg.user { flex-direction: row-reverse; }
+  .av {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .av.ai { background: linear-gradient(135deg, #00c6ff, #0072ff); font-size: 16px; box-shadow: 0 0 10px #0072ff33; }
+  .av.user { background: #1a2035; font-size: 13px; }
+  .bubble { max-width: 72%; padding: 12px 16px; font-size: 14px; line-height: 1.7; border-radius: 12px; }
+  .msg.ai .bubble {
+    background: #0d1525; border: 1px solid #1a2a40;
+    border-radius: 4px 12px 12px 12px; color: #c8d0e8;
+  }
+  .msg.user .bubble {
+    background: linear-gradient(135deg, #0072ff, #0050cc);
+    border-radius: 12px 4px 12px 12px; color: #fff;
+    box-shadow: 0 4px 14px #0072ff22;
+  }
+  .bubble strong { color: #00c6ff; font-weight: 600; }
+
+  .typing-wrap { display: none; max-width: 780px; margin: 0 auto; width: 100%; padding: 0 16px 4px; }
+  .typing-inner { display: flex; gap: 10px; align-items: center; }
+  .typing-bubble {
+    background: #0d1525; border: 1px solid #1a2a40;
+    border-radius: 4px 12px 12px 12px; padding: 11px 16px;
+    display: flex; gap: 5px; align-items: center;
+  }
+  .typing-bubble span { width: 6px; height: 6px; background: #4a5580; border-radius: 50%; animation: bounce .85s infinite; }
+  .typing-bubble span:nth-child(2) { animation-delay: .14s; }
+  .typing-bubble span:nth-child(3) { animation-delay: .28s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+  .quick-replies {
+    max-width: 780px; margin: 0 auto; width: 100%;
+    padding: 0 16px 10px; display: flex; flex-wrap: wrap; gap: 7px;
+  }
+  .qr-btn {
+    background: #0d1220; border: 1px solid #1a2035; color: #7a85aa;
+    font-size: 12px; padding: 6px 13px; border-radius: 20px; cursor: pointer; transition: all .15s;
+  }
+  .qr-btn:hover { border-color: #00c6ff44; color: #00c6ff; background: #0d1525; }
+
+  .input-area { background: #0d1220; border-top: 1px solid #1a2035; padding: 14px 16px; }
+  .input-wrap { max-width: 780px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
+  textarea {
+    flex: 1; background: #080c14; border: 1px solid #1a2035;
+    border-radius: 10px; color: #e8e6de; font-size: 14px; line-height: 1.5;
+    padding: 11px 14px; resize: none; outline: none;
+    min-height: 44px; max-height: 120px; font-family: inherit; transition: border-color .15s;
+  }
+  textarea:focus { border-color: #0072ff66; }
+  textarea::placeholder { color: #2a3050; }
+  .send-btn {
+    width: 44px; height: 44px;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    border: none; border-radius: 10px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .15s; flex-shrink: 0; box-shadow: 0 4px 14px #0072ff33;
+  }
+  .send-btn:hover { opacity: .85; }
+  .send-btn:disabled { opacity: .3; cursor: not-allowed; box-shadow: none; }
+  .send-btn svg { width: 18px; height: 18px; fill: #fff; }
+  .footer-note { text-align: center; font-size: 11px; color: #2a3050; margin-top: 8px; }
+  .footer-note span { color: #00c6ff; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ── SETUP ── -->
+<div id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-logo-wrap">
+      <!-- Weltrade logo SVG inline -->
+      <svg height="28" viewBox="0 0 120 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="22" font-family="Arial,sans-serif" font-weight="700" font-size="22" fill="#ffffff">WELTRADE</text>
+      </svg>
+      <div class="setup-divider"></div>
+      <div class="setup-brand">Wel<span>Coach</span></div>
+    </div>
+    <p class="tagline" id="setup-tagline">Strategic AI Coach for Weltrade IB Partners</p>
+
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('es')" id="btn-es">🌎 Español</button>
+      <button class="lang-btn" onclick="setLang('en')" id="btn-en">🇬🇧 English</button>
+    </div>
+
+    <div class="setup-error" id="setupError"></div>
+    <label id="label-key">Anthropic API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+    <button class="setup-btn" id="setup-start-btn" onclick="startApp()">Comenzar →</button>
+
+    <div class="by-credit">by Umut</div>
+    <div class="setup-hint" id="setup-hint-text">
+      ¿No tienes API Key? Consíguela en
+      <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+      Tu clave se guarda solo en este navegador, nunca se comparte.
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div id="mainApp">
+  <div class="header">
+    <div class="header-logo">
+      <svg height="24" viewBox="0 0 140 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <text x="0" y="19" font-family="Arial,sans-serif" font-weight="700" font-size="19" fill="#ffffff" opacity="0.9">WELTRADE</text>
+      </svg>
+      <div class="logo-sep"></div>
+      <div>
+        <div class="welcoach-brand">Wel<span>Coach</span></div>
+        <div class="header-sub" id="header-sub">IB Strategic Coach</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="lang-switch-btn" onclick="toggleLang()" id="lang-switch-btn">🌎 ES / EN</button>
+      <div class="online-badge"><div class="online-dot"></div><span id="online-txt">En línea</span></div>
+      <button class="reset-btn" id="exit-btn" onclick="resetApp()">Salir</button>
+    </div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="welcome-card" id="welcomeCard">
+      <div class="wc-header">
+        <div class="wc-icon">🏆</div>
+        <div>
+          <div class="wc-title">Wel<span>Coach</span> 👋</div>
+        </div>
+      </div>
+      <p class="wc-subtitle" id="wc-subtitle">Tu coach estratégico IB de Weltrade. Pregúntame cómo hacer crecer tu comunidad, aumentar FTDs, organizar eventos y más.</p>
+      <div class="topic-grid" id="topicGrid"></div>
+    </div>
+  </div>
+
+  <div class="quick-replies" id="quickReplies"></div>
+
+  <div class="typing-wrap" id="typingWrap">
+    <div class="typing-inner">
+      <div class="av ai">🏆</div>
+      <div class="typing-bubble"><span></span><span></span><span></span></div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-wrap">
+      <textarea id="userInput" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="footer-note"><span>WelCoach</span> · <span id="footer-powered">Powered by Weltrade IB Partner Program</span></div>
+  </div>
+</div>
+
+<script>
+// ── CONTENT BY LANGUAGE ──
+const CONTENT = {
+  es: {
+    setupTagline: "Coach estratégico IA para partners IB de Weltrade",
+    labelKey: "Anthropic API Key",
+    startBtn: "Comenzar →",
+    setupHint: '¿No tienes API Key? Consíguela en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>Tu clave se guarda solo en este navegador, nunca se comparte.',
+    headerSub: "Coach Estratégico IB",
+    onlineTxt: "En línea",
+    exitBtn: "Salir",
+    wcSubtitle: "Tu coach estratégico IB de Weltrade. Pregúntame cómo aumentar FTDs, crear tu VIP group, organizar eventos y hacer crecer tu comunidad.",
+    placeholder: "Escribe tu pregunta o situación...",
+    footerPowered: "Powered by Weltrade IB Partner Program · Latinoamérica",
+    topics: [
+      { icon: "💰", title: "¿Cómo hacer más FTDs?", sub: "Estrategias de primer depósito", q: "¿Cómo puedo conseguir más First Time Deposits (FTDs) en mi comunidad?" },
+      { icon: "👑", title: "¿Cómo crear un VIP Group?", sub: "Comunidades exclusivas", q: "¿Cómo puedo crear y gestionar un grupo VIP para mis mejores traders?" },
+      { icon: "🎤", title: "¿Cómo hacer eventos?", sub: "Online y offline", q: "¿Cómo organizo eventos online y offline para mi comunidad de traders?" },
+      { icon: "💤", title: "¿Cómo activar inactivos?", sub: "Reactivar traders dormidos", q: "Tengo muchos traders inactivos en mi comunidad. ¿Cómo los reactivo?" },
+      { icon: "🎯", title: "¿Cómo reclutar más IB?", sub: "Expandir tu red de partners", q: "¿Cómo puedo reclutar nuevos IB partners para expandir mi red?" },
+      { icon: "📱", title: "¿Cómo crecer en redes?", sub: "Instagram, TikTok, YouTube", q: "¿Qué estrategia uso para crecer en redes sociales como IB de Weltrade?" },
+      { icon: "🪙", title: "¿Cómo usar Welcoin?", sub: "Programa de lealtad", q: "¿Cómo puedo usar el programa Welcoin de Weltrade para atraer y retener traders?" },
+      { icon: "📊", title: "¿Cómo hacer webinars?", sub: "Contenido y estructura", q: "¿Cómo preparo un webinar efectivo para mis traders con contenido de Weltrade?" }
+    ],
+    quickReplies: [
+      { label: "💬 Mensaje WhatsApp listo", q: "Dame un mensaje de WhatsApp para enviar a un trader inactivo de mi comunidad" },
+      { label: "🎁 Usar bonos Weltrade", q: "¿Qué bonos y promociones de Weltrade puedo usar para atraer traders?" },
+      { label: "⚔️ Frente a competencia", q: "¿Cómo defiendo a Weltrade frente a traders que prefieren otro broker?" },
+      { label: "📋 Plan semanal", q: "Dame un plan de acción concreto para esta semana como IB de Weltrade" }
+    ]
+  },
+  en: {
+    setupTagline: "Strategic AI Coach for Weltrade IB Partners",
+    labelKey: "Anthropic API Key",
+    startBtn: "Get Started →",
+    setupHint: 'Don\'t have an API Key? Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>Your key is stored only in this browser and never shared.',
+    headerSub: "IB Strategic Coach",
+    onlineTxt: "Online",
+    exitBtn: "Exit",
+    wcSubtitle: "Your Weltrade IB strategic coach. Ask me how to increase FTDs, build a VIP group, run events, and grow your community.",
+    placeholder: "Type your question or situation...",
+    footerPowered: "Powered by Weltrade IB Partner Program · Global",
+    topics: [
+      { icon: "💰", title: "How to get more FTDs?", sub: "First deposit strategies", q: "How can I get more First Time Deposits (FTDs) from my community?" },
+      { icon: "👑", title: "How to build a VIP Group?", sub: "Exclusive communities", q: "How can I create and manage a VIP group for my best traders?" },
+      { icon: "🎤", title: "How to run events?", sub: "Online and offline", q: "How do I organize online and offline events for my trading community?" },
+      { icon: "💤", title: "How to reactivate inactives?", sub: "Wake up dormant traders", q: "I have many inactive traders in my community. How do I reactivate them?" },
+      { icon: "🎯", title: "How to recruit more IBs?", sub: "Expand your partner network", q: "How can I recruit new IB partners to expand my network?" },
+      { icon: "📱", title: "How to grow on social media?", sub: "Instagram, TikTok, YouTube", q: "What strategy should I use to grow on social media as a Weltrade IB?" },
+      { icon: "🪙", title: "How to use Welcoin?", sub: "Loyalty program", q: "How can I use Weltrade's Welcoin program to attract and retain traders?" },
+      { icon: "📊", title: "How to run webinars?", sub: "Content and structure", q: "How do I prepare an effective webinar for my traders using Weltrade content?" }
+    ],
+    quickReplies: [
+      { label: "💬 Ready-to-send message", q: "Give me a WhatsApp message to send to an inactive trader in my community" },
+      { label: "🎁 Use Weltrade bonuses", q: "What Weltrade bonuses and promotions can I use to attract traders?" },
+      { label: "⚔️ Against competition", q: "How do I defend Weltrade against traders who prefer another broker?" },
+      { label: "📋 Weekly action plan", q: "Give me a concrete weekly action plan as a Weltrade IB" }
+    ]
+  }
+};
+
+const SYSTEM_PROMPTS = {
+  es: `Eres WelCoach, el coach estratégico oficial para los partners IB (Introducing Brokers) de Weltrade. Hablas en español latinoamericano.
+
+=== CONOCIMIENTO PROFUNDO DE WELTRADE ===
+
+EMPRESA:
+- Broker forex internacional fundado en 2006, con 18+ años de experiencia
+- Más de 1.000.000 traders registrados, 10.000+ partners en 40+ países
+- $50M+ pagados a partners. Premio "Best Forex Broker Latam 2024"
+- Soporte 24/7 en 11 idiomas
+
+PLATAFORMAS: MT4 y MT5. También app móvil y WebTerminal.
+
+TIPOS DE CUENTA:
+1. Micro — desde $1, spreads flotantes, MT4/MT5, ideal principiantes
+2. Premium — desde $25, spreads desde 1.5 pips, acceso a stocks e índices, Copy Trading
+3. Pro — desde $500, spreads desde 0.5 pips, condiciones institucionales
+4. SyntX — desde $1, exclusiva para índices sintéticos, MT5, apalancamiento hasta 1:10.000
+5. Demo — ilimitada, sin riesgo, para practicar
+
+ÍNDICES SINTÉTICOS (SyntX):
+- FX Vol.: Replica el forex con volatilidad fija y predecible
+- SFX Vol.: Como FX Vol. pero con noticias simuladas que crean picos de precio
+- PainX / GainX: Subidas/bajadas constantes con saltos bruscos ocasionales
+  · Variantes: 400, 600, 800, 999, 1200 (% de apalancamiento)
+- FlipX: 50/50 de subida o bajada en cada tick
+- SwitchX: Alterna entre PainX y GainX después de cada salto
+- Financial Market Mirror: Instrumento demo para practicar estrategias
+- Disponibles 24/7, spreads 5-10x menores que instrumentos tradicionales
+- Volatilidad hasta 8x mayor que el oro (XAU/USD)
+- Apalancamiento hasta 1:10.000
+
+PROGRAMA IB (PARTNER):
+- Comisión por spread: Standard hasta 55%, Professional hasta 65%, Expert hasta 75%
+- Sistema multi-nivel disponible (requiere solicitud al soporte)
+- Estado automático mensual según volumen de clientes
+- Retiros de comisiones sin límite de tiempo
+- Materiales publicitarios listos para usar
+- Dashboard con analytics en tiempo real
+- Programa CPA disponible (pago por nuevo cliente)
+
+WELCOIN (Programa de Lealtad):
+- Moneda virtual de Weltrade ganada por cada trade en cualquier cuenta
+- Se acumulan automáticamente con cada spread pagado
+- Canjear en el Welshop por: vouchers de efectivo, bonos de trading, gadgets, cajas regalo Weltrade
+- También se ganan por actividad de referidos
+- Boosters disponibles para multiplicar coins ganados
+- NO se pueden ganar con cuentas que tengan bonos activos
+
+PROMOCIONES Y BONOS:
+- First Deposit Bonus: Bono en el primer depósito (hasta 100% con código EXTRA100)
+- Credit Bonus 100%: Para cuentas MT5 Micro y Premium
+- Spinner: Por cada $30 depositados, 1 giro de ruleta con premios
+- ASTROCARDS: Hasta $1.000 en fondos bonus con cada depósito de $100 en cuentas MT5
+- Welbox Quests: Retos de trading con premios de hasta $10.000 (tiers: Rare $100, Epic $1.000, Legendary $10.000)
+- No-Commission Deposit: Depósitos sin comisión
+- Interest on Margin: Hasta 20% anual de dividendos sobre el margen
+- Refer a Friend: Comisión por referir amigos
+
+COPY TRADING:
+- Disponible en Premium, Pro y SyntX
+- IB puede presentar el Copy Trading como ingreso pasivo para sus traders
+- Los traders pueden copiar estrategias de traders exitosos
+- IB también gana comisión por el volumen de trades copiados
+
+INSTRUMENTOS DE TRADING:
+- 37+ pares de forex
+- Metales (oro, plata)
+- Commodities (petróleo, gas)
+- 200+ CFDs de acciones (large-cap)
+- 14 índices CFD
+- 39 crypto CFDs
+- Índices sintéticos SyntX (24/7)
+
+=== TU ROL COMO WELCOACH ===
+Eres el coach de los IB. Ellos te preguntan cómo crecer su negocio IB. Siempre conectas tus consejos con las herramientas reales de Weltrade.
+
+CÓMO RESPONDER:
+- Español latinoamericano, tono cálido, directo y motivador
+- Máximo 4-5 puntos accionables — ¿qué hace el IB HOY?
+- Si piden mensaje WhatsApp/Telegram: redacta el texto COMPLETO entre comillas, listo para copiar, tono humano
+- Siempre menciona herramientas Weltrade relevantes (Welcoin, bonos, SyntX, Copy Trading, etc.)
+- Si mencionan país o tamaño de comunidad, adapta la respuesta
+- Para FTD: sugiere usar First Deposit Bonus como gancho principal
+- Para inactivos: sugiere mensajes 1 a 1 + Welcoin + Spinner como motivadores
+- Para VIP groups: sugiere segmentar por volumen y usar Welbox Quests como reto grupal
+- Para eventos: webinars sobre SyntX, Copy Trading o bonos como temas de alto interés
+
+PROHIBIDO: consejos de inversión específicos, promesas de ganancias garantizadas, trades específicos.`,
+
+  en: `You are WelCoach, the official strategic coach for Weltrade IB (Introducing Broker) partners. You speak in English.
+
+=== DEEP WELTRADE KNOWLEDGE ===
+
+COMPANY:
+- International forex broker founded in 2006, 18+ years of experience
+- 1,000,000+ registered traders, 10,000+ partners in 40+ countries
+- $50M+ paid to partners. Award: "Best Forex Broker Latam 2024"
+- 24/7 support in 11 languages
+
+PLATFORMS: MT4 and MT5. Also mobile app and WebTerminal.
+
+ACCOUNT TYPES:
+1. Micro — from $1, floating spreads, MT4/MT5, ideal for beginners
+2. Premium — from $25, spreads from 1.5 pips, access to stocks & indices, Copy Trading
+3. Pro — from $500, spreads from 0.5 pips, institutional-grade conditions
+4. SyntX — from $1, exclusive for synthetic indices, MT5, leverage up to 1:10,000
+5. Demo — unlimited, risk-free practice
+
+SYNTHETIC INDICES (SyntX):
+- FX Vol.: Replicates forex with fixed, predictable volatility
+- SFX Vol.: Like FX Vol. but with simulated news releases causing price spikes
+- PainX / GainX: Consistent price rises/falls with occasional sharp jumps
+  · Variants: 400, 600, 800, 999, 1200 (leverage %)
+- FlipX: 50/50 chance of up or down on each tick
+- SwitchX: Alternates between PainX and GainX after each jump
+- Financial Market Mirror: Demo instrument to practice strategies
+- Available 24/7, spreads 5-10x lower than traditional instruments
+- Volatility up to 8x higher than gold (XAU/USD)
+- Leverage up to 1:10,000
+
+IB PARTNER PROGRAM:
+- Spread commission: Standard up to 55%, Professional up to 65%, Expert up to 75%
+- Multi-level program available (requires support request)
+- Monthly automatic status based on client volume
+- Unlimited commission withdrawal period
+- Ready-made advertising materials
+- Real-time analytics dashboard
+- CPA program available
+
+WELCOIN (Loyalty Program):
+- Weltrade's virtual currency earned on every trade across any account
+- Auto-accumulated with every spread paid
+- Redeem at Welshop for: cash vouchers, trading bonuses, gadgets, Weltrade gift boxes
+- Also earned through referral activity
+- Boosters available to multiply coins earned
+- Cannot be earned on accounts with active bonuses
+
+PROMOTIONS & BONUSES:
+- First Deposit Bonus: Bonus on first deposit (up to 100% with code EXTRA100)
+- Credit Bonus 100%: For MT5 Micro and Premium accounts
+- Spinner: For every $30 deposited, 1 spin with prizes
+- ASTROCARDS: Up to $1,000 in bonus funds with each $100 deposit on MT5 accounts
+- Welbox Quests: Trading challenges with prizes up to $10,000 (Rare $100, Epic $1,000, Legendary $10,000)
+- No-Commission Deposit: Zero-fee deposits
+- Interest on Margin: Up to 20% annual dividends on margin
+- Refer a Friend: Commission for referring friends
+
+COPY TRADING:
+- Available on Premium, Pro, and SyntX
+- IBs can present Copy Trading as passive income for their traders
+- Traders can copy strategies from successful traders
+- IBs earn commission on copied trade volume
+
+TRADING INSTRUMENTS:
+- 37+ forex pairs
+- Metals (gold, silver)
+- Commodities (oil, gas)
+- 200+ stock CFDs (large-cap)
+- 14 index CFDs
+- 39 crypto CFDs
+- SyntX synthetic indices (24/7)
+
+=== YOUR ROLE AS WELCOACH ===
+You are the IB's coach. They ask you how to grow their IB business. Always connect advice to real Weltrade tools.
+
+HOW TO RESPOND:
+- English, warm, direct, motivating tone
+- Max 4-5 actionable points — what can the IB do TODAY?
+- If they ask for a WhatsApp/Telegram message: write the FULL text in quotes, ready to copy, natural human tone
+- Always mention relevant Weltrade tools (Welcoin, bonuses, SyntX, Copy Trading, etc.)
+- If they mention country or community size, adapt the response
+- For FTDs: suggest using First Deposit Bonus as the main hook
+- For inactives: suggest 1-on-1 messages + Welcoin + Spinner as motivators
+- For VIP groups: suggest segmenting by volume and using Welbox Quests as group challenges
+- For events: webinars on SyntX, Copy Trading, or bonuses as high-interest topics
+
+FORBIDDEN: specific investment advice, guaranteed profit promises, specific trade recommendations.`
+};
+
+let API_KEY = '';
+let currentLang = 'es';
+const history = [];
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  const c = CONTENT[lang];
+  document.getElementById('setup-tagline').textContent = c.setupTagline;
+  document.getElementById('label-key').textContent = c.labelKey;
+  document.getElementById('setup-start-btn').textContent = c.startBtn;
+  document.getElementById('setup-hint-text').innerHTML = c.setupHint;
+}
+
+function toggleLang() {
+  const newLang = currentLang === 'es' ? 'en' : 'es';
+  currentLang = newLang;
+  renderApp();
+}
+
+function renderApp() {
+  const c = CONTENT[currentLang];
+  document.getElementById('header-sub').textContent = c.headerSub;
+  document.getElementById('online-txt').textContent = c.onlineTxt;
+  document.getElementById('exit-btn').textContent = c.exitBtn;
+  document.getElementById('wc-subtitle').textContent = c.wcSubtitle;
+  document.getElementById('userInput').placeholder = c.placeholder;
+  document.getElementById('footer-powered').textContent = c.footerPowered;
+  document.getElementById('lang-switch-btn').textContent = currentLang === 'es' ? '🇬🇧 English' : '🌎 Español';
+
+  // Topics
+  const grid = document.getElementById('topicGrid');
+  grid.innerHTML = '';
+  c.topics.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.onclick = () => fillInput(t.q);
+    btn.innerHTML = `<span class="icon">${t.icon}</span><div class="ttext"><strong>${t.title}</strong><span>${t.sub}</span></div>`;
+    grid.appendChild(btn);
+  });
+
+  // Quick replies
+  const qr = document.getElementById('quickReplies');
+  qr.innerHTML = '';
+  c.quickReplies.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    btn.textContent = r.label;
+    btn.onclick = () => fillInput(r.q);
+    qr.appendChild(btn);
+  });
+}
+
+function startApp() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const err = document.getElementById('setupError');
+  if (!key.startsWith('sk-ant-')) {
+    err.textContent = currentLang === 'es'
+      ? 'La API Key no parece válida. Debe comenzar con "sk-ant-..."'
+      : 'API Key seems invalid. It should start with "sk-ant-..."';
+    err.style.display = 'block';
+    return;
+  }
+  API_KEY = key;
+  err.style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  renderApp();
+}
+
+function resetApp() {
+  const msg = currentLang === 'es' ? '¿Salir de WelCoach?' : 'Exit WelCoach?';
+  if (confirm(msg)) {
+    API_KEY = '';
+    history.length = 0;
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('setupScreen').style.display = 'flex';
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('chatArea').querySelectorAll('.msg').forEach(m => m.remove());
+    document.getElementById('welcomeCard').style.display = 'block';
+    document.getElementById('quickReplies').style.display = 'flex';
+  }
+}
+
+function fillInput(text) {
+  const el = document.getElementById('userInput');
+  el.value = text;
+  autoResize(el);
+  el.focus();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMsg(role, text) {
+  const area = document.getElementById('chatArea');
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+  const av = document.createElement('div');
+  av.className = `av ${role}`;
+  av.textContent = role === 'ai' ? '🏆' : '👤';
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  area.appendChild(wrap);
+  area.scrollTop = area.scrollHeight;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const btn = document.getElementById('sendBtn');
+  const tw = document.getElementById('typingWrap');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  btn.disabled = true;
+
+  document.getElementById('welcomeCard').style.display = 'none';
+  document.getElementById('quickReplies').style.display = 'none';
+
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+
+  tw.style.display = 'block';
+  document.getElementById('chatArea').scrollTop = 99999;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPTS[currentLang],
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    if (data.error) {
+      tw.style.display = 'none';
+      addMsg('ai', `⚠️ Error: ${data.error.message}`);
+      btn.disabled = false;
+      return;
+    }
+    const reply = data.content?.[0]?.text || 'No response received.';
+    history.push({ role: 'assistant', content: reply });
+    tw.style.display = 'none';
+    addMsg('ai', reply);
+  } catch (e) {
+    tw.style.display = 'none';
+    const errMsg = currentLang === 'es'
+      ? '⚠️ Error de conexión. Verifica tu internet e intenta de nuevo.'
+      : '⚠️ Connection error. Check your internet and try again.';
+    addMsg('ai', errMsg);
+  }
+
+  btn.disabled = false;
+  input.focus();
+}
+
+// Init
+setLang('es');
+</script>
+</body>
+</html>
