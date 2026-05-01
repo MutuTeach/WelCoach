@@ -1,0 +1,3189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IB Coach — Strategic Counsel for Introducing Brokers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0807;
+    --ink-2: #110e0b;
+    --surface: #15110d;
+    --surface-2: #1d1812;
+    --surface-3: #2a2218;
+    --line: #2a2218;
+    --line-strong: #3a3024;
+    --paper: #f4ecdc;
+    --paper-2: #d9cfb8;
+    --paper-dim: #9b8f7a;
+    --paper-dimmer: #5a5147;
+    --paper-faint: #3a3328;
+    --gold: #c9a961;
+    --gold-soft: #d9b971;
+    --gold-deep: #8a7340;
+    --signal: #e07b5e;
+    --signal-soft: #f0967b;
+    --sage: #86b97a;
+    --user-msg: #2a2218;
+    --user-msg-2: #1d1812;
+    --display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+    --body: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: var(--body);
+    background: var(--ink);
+    color: var(--paper);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01", "cv11";
+    letter-spacing: -0.005em;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain texture overlay - paper feeling */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.78 0 0 0 0 0.66 0 0 0 0 0.38 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Ambient gradient glow — deep amber bottom */
+  /* Animated gold aurora */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at var(--glow1-x, 50%) var(--glow1-y, 110%), rgba(201, 169, 97, 0.10), transparent 60%),
+      radial-gradient(ellipse 50% 35% at var(--glow2-x, 10%) var(--glow2-y, 0%), rgba(201, 169, 97, 0.05), transparent 60%);
+    animation: auroraBreath 28s ease-in-out infinite;
+  }
+
+  /* Tone aurora down significantly when in main app — focus on chat */
+  body:has(#mainApp[style*="flex"])::after {
+    animation: none;
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 110%, rgba(201, 169, 97, 0.06), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 10% 0%, rgba(201, 169, 97, 0.03), transparent 60%);
+  }
+
+  /* Register custom properties for smooth interpolation */
+  @property --glow1-x { syntax: '<percentage>'; initial-value: 50%; inherits: false; }
+  @property --glow1-y { syntax: '<percentage>'; initial-value: 110%; inherits: false; }
+  @property --glow2-x { syntax: '<percentage>'; initial-value: 10%; inherits: false; }
+  @property --glow2-y { syntax: '<percentage>'; initial-value: 0%; inherits: false; }
+
+  @keyframes auroraBreath {
+    0%, 100% {
+      --glow1-x: 50%; --glow1-y: 110%;
+      --glow2-x: 10%; --glow2-y: 0%;
+      opacity: 1;
+    }
+    33% {
+      --glow1-x: 70%; --glow1-y: 105%;
+      --glow2-x: 20%; --glow2-y: 5%;
+      opacity: 0.85;
+    }
+    66% {
+      --glow1-x: 30%; --glow1-y: 115%;
+      --glow2-x: 5%; --glow2-y: -5%;
+      opacity: 1.1;
+    }
+  }
+
+  /* ── Floating particles (setup screen only) ── */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  /* Hide particles when main app is showing (only setup needs ambience) */
+  body:has(#mainApp[style*="flex"]) .particles { display: none; }
+
+  .particle {
+    position: absolute;
+    width: 2px; height: 2px;
+    border-radius: 50%;
+    background: rgba(201, 169, 97, 0.5);
+    box-shadow: 0 0 4px rgba(201, 169, 97, 0.3);
+    bottom: -10px;
+    animation: particleDrift linear infinite;
+  }
+
+  .particle:nth-child(1)  { left: 8%;  animation-duration: 38s; animation-delay: 0s; }
+  .particle:nth-child(2)  { left: 18%; animation-duration: 45s; animation-delay: -8s; width: 1.5px; height: 1.5px; }
+  .particle:nth-child(3)  { left: 27%; animation-duration: 42s; animation-delay: -20s; }
+  .particle:nth-child(4)  { left: 35%; animation-duration: 50s; animation-delay: -5s; width: 1px; height: 1px; opacity: 0.6; }
+  .particle:nth-child(5)  { left: 47%; animation-duration: 40s; animation-delay: -15s; }
+  .particle:nth-child(6)  { left: 58%; animation-duration: 47s; animation-delay: -30s; width: 1.5px; height: 1.5px; }
+  .particle:nth-child(7)  { left: 68%; animation-duration: 36s; animation-delay: -2s; }
+  .particle:nth-child(8)  { left: 76%; animation-duration: 44s; animation-delay: -22s; opacity: 0.7; }
+  .particle:nth-child(9)  { left: 84%; animation-duration: 41s; animation-delay: -10s; width: 1px; height: 1px; }
+  .particle:nth-child(10) { left: 92%; animation-duration: 39s; animation-delay: -28s; }
+
+  @keyframes particleDrift {
+    0% { bottom: -10px; transform: translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { bottom: 105%; transform: translateX(15px); opacity: 0; }
+  }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    body::after { animation: none !important; }
+    .particle { animation: none !important; opacity: 0; }
+    .setup-card::before { animation: none !important; }
+    .setup-card::after { animation: none !important; opacity: 0.35; }
+  }
+
+  /* ════════════════════════════════════════════════
+     SETUP SCREEN
+     ════════════════════════════════════════════════ */
+  #setupScreen {
+    flex: 1; display: flex; align-items: center;
+    justify-content: center; padding: 32px;
+    position: relative; z-index: 2;
+  }
+
+  .setup-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 48px 44px;
+    max-width: 460px; width: 100%;
+    position: relative;
+    box-shadow:
+      0 1px 0 rgba(244, 236, 220, 0.04) inset,
+      0 60px 100px -40px rgba(0, 0, 0, 0.6);
+  }
+
+  .setup-card::before {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(201, 169, 97, 0.12);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  /* Breathing top gold accent line */
+  .setup-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    animation: lineBreath 14s ease-in-out infinite;
+  }
+
+  @keyframes lineBreath {
+    0%, 100% { opacity: 0.35; transform: scaleX(0.85); }
+    50% { opacity: 0.7; transform: scaleX(1); }
+  }
+
+  .setup-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--gold);
+    margin-bottom: 18px;
+    text-align: center;
+  }
+
+  .setup-eyebrow::before, .setup-eyebrow::after {
+    content: '—';
+    color: var(--gold-deep);
+    margin: 0 12px;
+  }
+
+  .setup-brand {
+    font-family: var(--display);
+    font-size: 42px;
+    font-weight: 400;
+    color: var(--paper);
+    text-align: center;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-bottom: 6px;
+  }
+
+  .setup-brand em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--gold);
+  }
+
+  .setup-tagline {
+    font-family: var(--display);
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--paper-dim);
+    text-align: center;
+    margin-bottom: 32px;
+    letter-spacing: 0.01em;
+  }
+
+  .lang-toggle {
+    display: flex; gap: 0;
+    margin-bottom: 28px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .lang-btn {
+    flex: 1; padding: 11px;
+    border: none;
+    background: transparent;
+    color: var(--paper-dim);
+    font-family: var(--body);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+  }
+
+  .lang-btn + .lang-btn { border-left: 1px solid var(--line); }
+
+  .lang-btn:hover { color: var(--paper); background: var(--surface-2); }
+
+  .lang-btn.active {
+    background: var(--gold);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .field-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--paper-dim);
+    margin-bottom: 10px;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--paper);
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 14px 16px;
+    outline: none;
+    transition: all 0.2s ease;
+    margin-bottom: 18px;
+    letter-spacing: 0.02em;
+  }
+
+  .field-input:focus {
+    border-color: var(--gold);
+    background: var(--ink-2);
+  }
+
+  .field-input::placeholder {
+    color: var(--paper-faint);
+    font-family: var(--body);
+    letter-spacing: 0;
+  }
+
+  .setup-btn {
+    width: 100%;
+    background: var(--paper);
+    border: none;
+    border-radius: 2px;
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    position: relative;
+  }
+
+  .setup-btn:hover {
+    background: var(--gold);
+    transform: translateY(-1px);
+  }
+
+  .setup-error {
+    background: rgba(224, 123, 94, 0.08);
+    border: 1px solid rgba(224, 123, 94, 0.3);
+    border-radius: 2px;
+    color: var(--signal-soft);
+    font-size: 12px;
+    padding: 11px 14px;
+    margin-bottom: 14px;
+    display: none;
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .setup-hint {
+    font-size: 11px;
+    color: var(--paper-dimmer);
+    margin-top: 22px;
+    line-height: 1.7;
+    text-align: center;
+    padding-top: 22px;
+    border-top: 1px solid var(--line);
+  }
+
+  .setup-hint a {
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--gold-deep);
+    transition: all 0.15s;
+  }
+
+  .setup-hint a:hover { color: var(--gold-soft); border-color: var(--gold); }
+
+  .by-credit {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.32em;
+    color: var(--paper-dimmer);
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  /* ════════════════════════════════════════════════
+     MAIN APP
+     ════════════════════════════════════════════════ */
+  #mainApp { display: none; flex-direction: column; flex: 1; position: relative; z-index: 2; min-height: 100vh; }
+
+  .header {
+    background: rgba(15, 13, 10, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 32px;
+    display: flex; align-items: center; gap: 18px;
+    flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 50;
+  }
+
+  .header-logo { display: flex; align-items: center; gap: 14px; }
+
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    position: relative;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(10, 8, 7, 0.18);
+    border-radius: 1px;
+    pointer-events: none;
+  }
+
+  .ibcoach-brand {
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--paper);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .ibcoach-brand em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gold);
+  }
+
+  .header-sub {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--paper-dimmer);
+    margin-top: 4px;
+  }
+
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .online-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 6px 11px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--sage);
+  }
+
+  .online-dot {
+    width: 6px; height: 6px;
+    background: var(--sage);
+    border-radius: 50%;
+    animation: pulse 2.5s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(134, 185, 122, 0.6);
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  .lang-switch-btn, .reset-btn {
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 6px 12px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--paper-dim);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .lang-switch-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .reset-btn:hover { border-color: var(--signal); color: var(--signal-soft); }
+
+  .mode-banner {
+    background: linear-gradient(90deg, rgba(201, 169, 97, 0.06), transparent);
+    border-bottom: 1px solid rgba(201, 169, 97, 0.15);
+    padding: 10px 32px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-align: center;
+    display: none;
+  }
+
+  .mode-banner.show { display: block; }
+
+  .mode-banner em {
+    font-family: var(--display);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 13px;
+    color: var(--paper);
+    margin-left: 8px;
+  }
+
+  /* ── CHAT ── */
+  .chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 36px 24px 24px;
+    display: flex; flex-direction: column; gap: 24px;
+    max-width: 820px; width: 100%; margin: 0 auto;
+  }
+
+  .chat-area::-webkit-scrollbar { width: 8px; }
+  .chat-area::-webkit-scrollbar-track { background: transparent; }
+  .chat-area::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 4px; }
+  .chat-area::-webkit-scrollbar-thumb:hover { background: var(--gold-deep); }
+
+  /* ── WELCOME CARD ── */
+  .welcome-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 36px 32px 28px;
+    position: relative;
+    animation: fadeUp 0.6s ease-out;
+  }
+
+  .welcome-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 32px; right: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .wc-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .wc-title {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--paper);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .wc-title em {
+    font-style: italic;
+    color: var(--gold);
+    font-weight: 300;
+  }
+
+  .wc-subtitle {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--paper-dim);
+    margin-bottom: 26px;
+    max-width: 560px;
+  }
+
+  /* MODE PICKER */
+  .mode-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .mode-pick-btn {
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 22px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.25s ease;
+    display: flex; flex-direction: column; gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-pick-btn::after {
+    content: '→';
+    position: absolute;
+    top: 22px; right: 20px;
+    font-size: 16px;
+    color: var(--paper-dimmer);
+    transition: all 0.25s ease;
+  }
+
+  .mode-pick-btn:hover {
+    border-color: var(--gold);
+    background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+
+  .mode-pick-btn:hover::after { color: var(--gold); transform: translateX(4px); }
+
+  .mode-pick-btn.featured {
+    background: linear-gradient(135deg, rgba(201, 169, 97, 0.06), transparent);
+    border-color: rgba(201, 169, 97, 0.4);
+  }
+
+  .mode-pick-btn.featured::after { color: var(--gold); }
+
+  .mp-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+  }
+
+  .mp-title {
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 400;
+    color: var(--paper);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .mp-sub {
+    font-size: 12px;
+    color: var(--paper-dim);
+    line-height: 1.5;
+    max-width: 220px;
+  }
+
+  /* TOPICS — editorial numbered list */
+  .topics-divider {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--paper-dimmer);
+  }
+
+  .topics-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .topic-btn {
+    background: var(--surface);
+    border: none;
+    padding: 18px 20px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 16px;
+    align-items: start;
+    position: relative;
+  }
+
+  .topic-btn:hover {
+    background: var(--surface-2);
+    z-index: 2;
+    box-shadow: inset 0 0 0 1px var(--gold-deep);
+  }
+
+  .topic-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    padding-top: 3px;
+    min-width: 22px;
+  }
+
+  .topic-content { display: flex; flex-direction: column; gap: 4px; }
+
+  .topic-icon {
+    font-size: 14px;
+    margin-right: 6px;
+    opacity: 0.85;
+  }
+
+  .topic-title {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--paper);
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+  }
+
+  .topic-sub {
+    font-size: 11.5px;
+    color: var(--paper-dimmer);
+    line-height: 1.45;
+    margin-top: 3px;
+  }
+
+  /* ── MESSAGES ── */
+  .msg {
+    display: flex;
+    gap: 14px;
+    animation: msgIn 0.35s ease-out;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user { flex-direction: row-reverse; }
+
+  .av {
+    width: 36px; height: 36px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+
+  .av.ai {
+    background: var(--paper);
+    color: var(--ink);
+    position: relative;
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .av.ai::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(10, 8, 7, 0.15);
+    border-radius: 1px;
+  }
+
+  .av.user {
+    background: var(--surface-3);
+    color: var(--paper-dim);
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+
+  .bubble {
+    max-width: 76%;
+    padding: 22px 26px;
+    font-size: 13.5px;
+    line-height: 1.62;
+    border-radius: 3px;
+    position: relative;
+    letter-spacing: -0.005em;
+    color: var(--paper-2);
+  }
+
+  .msg.ai .bubble {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--paper-2);
+    font-family: var(--body);
+  }
+
+  .msg.user .bubble {
+    background: var(--user-msg);
+    border: 1px solid var(--line-strong);
+    color: var(--paper);
+    font-family: var(--body);
+    max-width: 70%;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+
+  /* ── AI message rich content rendering ── */
+  .bubble p {
+    margin-bottom: 0.7em;
+    color: var(--paper-2);
+  }
+  .bubble p:last-child { margin-bottom: 0; }
+
+  .bubble strong {
+    color: var(--paper);
+    font-weight: 600;
+  }
+
+  /* H1 — main title (rare, opens response) */
+  .msg-h1 {
+    display: block;
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--paper);
+    letter-spacing: -0.015em;
+    margin: 0 0 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .msg-h1:first-child { margin-top: 0; }
+
+  /* H2 — section header (most common) */
+  .msg-h2 {
+    display: block;
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: var(--paper);
+    letter-spacing: -0.012em;
+    margin: 26px 0 12px;
+    padding-bottom: 8px;
+    position: relative;
+  }
+
+  .msg-h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.6;
+  }
+
+  .msg-h2:first-child { margin-top: 0; }
+
+  .msg-h2 .gold-dot {
+    color: var(--gold);
+    margin-right: 4px;
+  }
+
+  /* H3 — sub-section / inline bold-as-header pattern */
+  .msg-h3 {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--paper);
+    letter-spacing: -0.005em;
+    margin: 22px 0 10px;
+    position: relative;
+  }
+
+  .msg-h3::before {
+    content: '';
+    flex-shrink: 0;
+    width: 14px;
+    height: 1px;
+    background: var(--gold);
+    margin-top: 0;
+    transform: translateY(-4px);
+  }
+
+  .msg-h3:first-child { margin-top: 0; }
+
+  /* Subtle horizontal divider — replaces ugly "---" */
+  .msg-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--line-strong) 20%, var(--line-strong) 80%, transparent);
+    margin: 18px 0;
+    border: none;
+  }
+
+  /* Script blocks — quoted WhatsApp/Telegram templates rendered like printed paper */
+  .script-block {
+    background: #ebe2cd;
+    color: #2a2218;
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 13.5px;
+    font-weight: 400;
+    line-height: 1.65;
+    padding: 18px 22px 16px;
+    border-radius: 2px;
+    margin: 14px 0;
+    border-left: 2px solid var(--gold);
+    position: relative;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.4),
+      0 1px 0 rgba(255, 255, 255, 0.5) inset,
+      0 -1px 0 rgba(0, 0, 0, 0.05) inset;
+    letter-spacing: 0.005em;
+  }
+
+  .script-block::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n2'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.04 0 0 0 0 0.03 0 0 0 0 0.02 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n2)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    border-radius: 2px;
+    mix-blend-mode: multiply;
+    opacity: 0.6;
+  }
+
+  .script-block::after {
+    content: 'TEMPLATE';
+    position: absolute;
+    top: -8px;
+    right: 14px;
+    background: var(--ink);
+    color: var(--gold);
+    font-family: var(--mono);
+    font-style: normal;
+    font-size: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    padding: 2px 9px 3px;
+    border-radius: 1px;
+    border: 1px solid var(--gold-deep);
+    font-weight: 500;
+  }
+
+  .script-block p {
+    color: #2a2218 !important;
+    margin: 0 0 0.5em !important;
+    position: relative;
+    z-index: 1;
+  }
+  .script-block p:last-child { margin-bottom: 0 !important; }
+  .script-block strong { color: #1a1410 !important; }
+
+  /* Numbered list */
+  .num-item {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 8px 0;
+    line-height: 1.6;
+  }
+
+  .num-item .n {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+    min-width: 22px;
+    text-align: right;
+    padding-top: 2px;
+  }
+
+  .num-item > span:last-child {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Bullet list */
+  .bul-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 6px 0;
+    line-height: 1.6;
+  }
+
+  .bul-item::before {
+    content: '';
+    flex-shrink: 0;
+    width: 5px;
+    height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+    margin-top: 9px;
+  }
+
+  .bul-item > span {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Numbers and currency emphasis */
+  .bubble .num-emph {
+    font-family: var(--mono);
+    font-size: 0.94em;
+    color: var(--gold-soft);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 5px 10px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--paper-dim);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s ease;
+  }
+
+  .msg.ai .bubble:hover .copy-btn { opacity: 1; }
+
+  .copy-btn:hover {
+    background: var(--gold);
+    color: var(--ink);
+    border-color: var(--gold);
+  }
+
+  .copy-btn.copied {
+    background: var(--sage);
+    color: var(--ink);
+    border-color: var(--sage);
+  }
+
+  /* TYPING */
+  .typing-wrap {
+    display: none;
+    max-width: 820px; margin: 0 auto; width: 100%;
+    padding: 0 24px 8px;
+  }
+
+  .typing-inner {
+    display: flex; gap: 14px; align-items: center;
+  }
+
+  .typing-bubble {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 14px 20px;
+    display: flex; gap: 6px; align-items: center;
+  }
+
+  .typing-bubble .dot {
+    width: 5px; height: 5px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: bounce 1s ease-in-out infinite;
+  }
+
+  .typing-bubble .dot:nth-child(2) { animation-delay: 0.15s; }
+  .typing-bubble .dot:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-5px); opacity: 1; }
+  }
+
+  /* QUICK REPLIES */
+  .quick-replies {
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 24px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .qr-btn {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--paper-dim);
+    font-family: var(--body);
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: -0.005em;
+  }
+
+  .qr-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: var(--surface-2);
+  }
+
+  /* INPUT */
+  .input-area {
+    background: rgba(15, 13, 10, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--line);
+    padding: 18px 24px;
+    position: sticky; bottom: 0;
+  }
+
+  .input-wrap {
+    max-width: 820px; margin: 0 auto;
+    display: flex; gap: 12px; align-items: flex-end;
+  }
+
+  textarea {
+    flex: 1;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--paper);
+    font-family: var(--body);
+    font-size: 14px;
+    line-height: 1.55;
+    padding: 14px 16px;
+    resize: none;
+    outline: none;
+    min-height: 50px;
+    max-height: 140px;
+    transition: border-color 0.2s ease;
+    letter-spacing: -0.003em;
+  }
+
+  textarea:focus { border-color: var(--gold); }
+
+  textarea::placeholder {
+    color: var(--paper-faint);
+    font-style: italic;
+  }
+
+  .send-btn {
+    width: 50px; height: 50px;
+    background: var(--paper);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .send-btn::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border: 1px solid rgba(10, 8, 7, 0.18);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .send-btn:hover { background: var(--gold); transform: translateY(-1px); }
+
+  .send-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .send-btn svg { width: 18px; height: 18px; fill: var(--ink); }
+
+  .footer-note {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--paper-dimmer);
+    margin-top: 12px;
+  }
+
+  .footer-note em {
+    font-family: var(--display);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+    color: var(--gold);
+  }
+
+  /* ════════════════════════════════════════════════
+     NEGOTIATION ROLE-PLAY UI
+     ════════════════════════════════════════════════ */
+
+  .neg-setup {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 36px 32px;
+    position: relative;
+    animation: fadeUp 0.5s ease-out;
+  }
+
+  .neg-setup::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 32px; right: 32px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+
+  .neg-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--gold);
+    margin-bottom: 14px;
+  }
+
+  .neg-title {
+    font-family: var(--display);
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--paper);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .neg-title em { font-style: italic; color: var(--gold); font-weight: 300; }
+
+  .neg-intro {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.55;
+    color: var(--paper-dim);
+    margin-bottom: 28px;
+    max-width: 560px;
+  }
+
+  .neg-section {
+    margin-bottom: 22px;
+  }
+
+  .neg-section-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--paper-dim);
+    margin-bottom: 10px;
+  }
+
+  /* Scenario presets */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .scenario-btn {
+    background: var(--surface-2);
+    border: none;
+    padding: 16px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    font-family: var(--body);
+    color: var(--paper-2);
+    position: relative;
+  }
+
+  .scenario-btn:hover {
+    background: var(--surface-3);
+    box-shadow: inset 0 0 0 1px var(--gold-deep);
+    z-index: 2;
+  }
+
+  .scenario-btn.selected {
+    background: var(--ink);
+    box-shadow: inset 0 0 0 1px var(--gold);
+    z-index: 2;
+  }
+
+  .scenario-btn.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 14px; right: 14px;
+    color: var(--gold);
+    font-size: 14px;
+  }
+
+  .scenario-icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .scenario-name {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--paper);
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+
+  .scenario-desc {
+    font-size: 11px;
+    color: var(--paper-dimmer);
+    line-height: 1.4;
+  }
+
+  /* Difficulty selector */
+  .difficulty-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .diff-btn {
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 14px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    font-family: var(--body);
+  }
+
+  .diff-btn:hover { border-color: var(--paper-dim); }
+
+  .diff-btn.selected {
+    border-color: var(--gold);
+    background: var(--surface-2);
+  }
+
+  .diff-name {
+    display: block;
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--paper);
+    margin-bottom: 3px;
+  }
+
+  .diff-tag {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--paper-dimmer);
+  }
+
+  .diff-btn.selected .diff-tag { color: var(--gold); }
+
+  /* Custom context textarea */
+  .neg-textarea {
+    width: 100%;
+    background: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--paper);
+    font-family: var(--body);
+    font-size: 13px;
+    line-height: 1.55;
+    padding: 14px 16px;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    max-height: 200px;
+    transition: border-color 0.2s ease;
+    letter-spacing: -0.003em;
+  }
+
+  .neg-textarea:focus { border-color: var(--gold); }
+  .neg-textarea::placeholder { color: var(--paper-faint); font-style: italic; }
+
+  .neg-start-btn {
+    width: 100%;
+    background: var(--paper);
+    border: none;
+    border-radius: 2px;
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-top: 14px;
+  }
+
+  .neg-start-btn:hover { background: var(--gold); transform: translateY(-1px); }
+
+  .neg-start-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Active negotiation banner — replaces mode-banner during roleplay */
+  .neg-active-banner {
+    background: linear-gradient(90deg, rgba(224, 123, 94, 0.08), rgba(201, 169, 97, 0.06));
+    border-bottom: 1px solid rgba(224, 123, 94, 0.25);
+    padding: 12px 32px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .neg-active-banner.show { display: flex; }
+
+  .neg-active-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--signal-soft);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .neg-rec-dot {
+    width: 7px; height: 7px;
+    background: var(--signal);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(224, 123, 94, 0.6);
+    flex-shrink: 0;
+  }
+
+  .neg-active-info em {
+    font-family: var(--display);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 13px;
+    color: var(--paper);
+    margin-left: 4px;
+  }
+
+  .neg-end-btn {
+    background: var(--signal);
+    color: var(--ink);
+    border: none;
+    border-radius: 2px;
+    padding: 7px 14px;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .neg-end-btn:hover { background: var(--signal-soft); transform: translateY(-1px); }
+
+  /* Partner role indicator on AI messages during negotiation */
+  .av.partner {
+    background: var(--surface-3);
+    color: var(--signal-soft);
+    border: 1px solid var(--signal);
+    font-style: italic;
+    font-size: 16px;
+  }
+
+  .av.partner::after {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border: 1px solid rgba(224, 123, 94, 0.2);
+    border-radius: 1px;
+  }
+
+  .msg.partner .bubble {
+    background: var(--surface);
+    border: 1px solid rgba(224, 123, 94, 0.3);
+    border-left: 3px solid var(--signal);
+    color: var(--paper-2);
+  }
+
+  /* Debrief panel — appears after negotiation ends */
+  .debrief-banner {
+    background: linear-gradient(90deg, rgba(134, 185, 122, 0.06), rgba(201, 169, 97, 0.04));
+    border-bottom: 1px solid rgba(134, 185, 122, 0.2);
+    padding: 10px 32px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--sage);
+    text-align: center;
+    display: none;
+  }
+
+  .debrief-banner.show { display: block; }
+
+  .debrief-banner em {
+    font-family: var(--display);
+    font-style: italic;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-size: 13px;
+    color: var(--paper);
+    margin-left: 8px;
+  }
+
+  @media (max-width: 720px) {
+    .scenario-grid { grid-template-columns: 1fr; }
+    .difficulty-row { grid-template-columns: 1fr; gap: 6px; }
+    .neg-active-banner { padding: 10px 16px; flex-wrap: wrap; }
+    .neg-setup { padding: 28px 22px; }
+    .neg-title { font-size: 22px; }
+  }
+  @media (max-width: 720px) {
+    #setupScreen { padding: 20px; }
+    .setup-card { padding: 36px 26px; }
+    .setup-brand { font-size: 36px; }
+    .header { padding: 14px 18px; gap: 10px; }
+    .header-right { gap: 6px; }
+    .chat-area { padding: 24px 16px 16px; }
+    .welcome-card { padding: 28px 22px 22px; }
+    .wc-title { font-size: 26px; }
+    .mode-picker { grid-template-columns: 1fr; }
+    .topic-grid { grid-template-columns: 1fr; }
+    .bubble { max-width: 88% !important; padding: 16px 18px; }
+    .input-area { padding: 14px 16px; }
+    .quick-replies { padding: 0 16px 10px; }
+    .typing-wrap { padding: 0 16px 8px; }
+  }
+
+  @media (max-width: 480px) {
+    .setup-brand { font-size: 32px; }
+    .wc-title { font-size: 22px; }
+    .mp-title { font-size: 17px; }
+    .topic-title { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ SETUP ════════════════ -->
+<div id="setupScreen">
+  <div class="particles" aria-hidden="true">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="setup-card">
+    <div class="setup-eyebrow">Strategic counsel</div>
+    <div class="setup-brand">IB <em>Coach</em></div>
+    <p class="setup-tagline" id="setup-tagline">Strategic AI assistant for Introducing Brokers</p>
+
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('es')" id="btn-es">Español</button>
+      <button class="lang-btn" onclick="setLang('en')" id="btn-en">English</button>
+    </div>
+
+    <div class="setup-error" id="setupError"></div>
+    <label class="field-label" id="label-key">Anthropic API Key</label>
+    <input type="password" class="field-input" id="apiKeyInput" placeholder="sk-ant-api03-..." />
+    <button class="setup-btn" id="setup-start-btn" onclick="startApp()">Begin</button>
+
+    <div class="setup-hint" id="setup-hint-text">
+      ¿No tienes API Key? Consíguela en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.<br>
+      Tu clave permanece sólo en este navegador.
+    </div>
+
+    <div class="by-credit">By Umut</div>
+  </div>
+</div>
+
+<!-- ════════════════ MAIN APP ════════════════ -->
+<div id="mainApp">
+  <header class="header">
+    <div class="header-logo">
+      <div class="logo-mark">IB</div>
+      <div>
+        <div class="ibcoach-brand">IB <em>Coach</em></div>
+        <div class="header-sub" id="header-sub">Strategic Counsel</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="lang-switch-btn" onclick="goToMenu()" id="menu-btn" title="Change mode">Menu</button>
+      <button class="lang-switch-btn" onclick="toggleLang()" id="lang-switch-btn">ES / EN</button>
+      <div class="online-badge"><div class="online-dot"></div><span id="online-txt">Online</span></div>
+      <button class="reset-btn" id="exit-btn" onclick="resetApp()">Exit</button>
+    </div>
+  </header>
+
+  <div class="mode-banner" id="modeBanner">
+    <span id="mode-banner-text">Onboarding</span> <em id="mode-banner-sub">— guiding you step by step</em>
+  </div>
+
+  <div class="neg-active-banner" id="negActiveBanner">
+    <div class="neg-active-info">
+      <div class="neg-rec-dot"></div>
+      <span id="neg-active-label">Live Negotiation</span>
+      <em id="neg-active-scenario"></em>
+    </div>
+    <button class="neg-end-btn" id="negEndBtn" onclick="endNegotiation()">End & Get Feedback</button>
+  </div>
+
+  <div class="debrief-banner" id="debriefBanner">
+    <span id="debrief-label">Debrief</span> <em id="debrief-sub">— review your performance</em>
+  </div>
+
+  <main class="chat-area" id="chatArea">
+    <div class="welcome-card" id="welcomeCard">
+      <div class="wc-eyebrow" id="wc-eyebrow">— Welcome —</div>
+      <h1 class="wc-title" id="wc-title-text">Strategic counsel for the <em>introducing broker</em>.</h1>
+      <p class="wc-subtitle" id="wc-subtitle">Choose your path below — whether you're starting your first IB business or scaling an established community of traders.</p>
+
+      <div class="mode-picker" id="modePicker"></div>
+
+      <div class="topics-divider" id="topics-divider-text">— Common questions —</div>
+      <div class="topic-grid" id="topicGrid"></div>
+    </div>
+
+    <div class="neg-setup" id="negSetup" style="display:none">
+      <div class="neg-eyebrow" id="neg-eyebrow">— Negotiation Practice —</div>
+      <h1 class="neg-title" id="neg-title">Rehearse your <em>negotiation</em>.</h1>
+      <p class="neg-intro" id="neg-intro">Build confidence before the real conversation. Set up a scenario, choose your partner's profile, and practice with realistic objections.</p>
+
+      <div class="neg-section">
+        <label class="neg-section-label" id="neg-scenario-label">Scenario</label>
+        <div class="scenario-grid" id="scenarioGrid"></div>
+      </div>
+
+      <div class="neg-section">
+        <label class="neg-section-label" id="neg-difficulty-label">Partner's Difficulty</label>
+        <div class="difficulty-row" id="difficultyRow"></div>
+      </div>
+
+      <div class="neg-section">
+        <label class="neg-section-label" id="neg-context-label">Specific context (optional)</label>
+        <textarea class="neg-textarea" id="negContext" placeholder="Add details about the partner: their volume, history, what they want, key concerns..."></textarea>
+      </div>
+
+      <button class="neg-start-btn" id="negStartBtn" onclick="startNegotiation()">Start Negotiation</button>
+    </div>
+  </main>
+
+  <div class="quick-replies" id="quickReplies"></div>
+
+  <div class="typing-wrap" id="typingWrap">
+    <div class="typing-inner">
+      <div class="av ai">Umut</div>
+      <div class="typing-bubble"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    </div>
+  </div>
+
+  <footer class="input-area">
+    <div class="input-wrap">
+      <textarea id="userInput" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()" aria-label="Send">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+    <div class="footer-note"><em>IB Coach</em> · Strategic counsel for forex partners</div>
+  </footer>
+</div>
+
+<script>
+const MODEL = 'claude-sonnet-4-5';
+const MAX_HISTORY = 30;
+const MAX_TOKENS = 1800;
+
+const CONTENT = {
+  es: {
+    setupTagline: "Asistente estratégico IA para Introducing Brokers",
+    labelKey: "Anthropic API Key",
+    startBtn: "Comenzar",
+    setupHint: '¿No tienes API Key? Consíguela en <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.<br>Tu clave permanece sólo en este navegador.',
+    headerSub: "Consejo Estratégico",
+    onlineTxt: "En línea",
+    exitBtn: "Salir",
+    wcEyebrow: "— Bienvenido —",
+    wcTitle: 'Consejo estratégico para el <em>introducing broker</em>.',
+    wcSubtitle: "Elige tu camino abajo — ya sea que estés empezando tu primer negocio IB o escalando una comunidad establecida de traders.",
+    topicsDivider: "— Preguntas frecuentes —",
+    placeholder: "Escribe tu pregunta o situación...",
+    footerPowered: "Consejo estratégico para partners de forex",
+    modeBannerText: "Modo Onboarding",
+    modeBannerSub: "— te guiaré paso a paso",
+    modes: [
+      { id: 'onboarding', label: '01 · Empezar', title: 'Soy IB nuevo', sub: 'Guíame paso a paso por el negocio IB desde cero', featured: false },
+      { id: 'coach', label: '02 · Crecer', title: 'Ya soy IB activo', sub: 'Necesito estrategias para crecer mi comunidad', featured: false },
+      { id: 'negotiation', label: '03 · Negociar', title: 'Práctica de negociación', sub: 'Simula una negociación antes de hacerla en la vida real', featured: true }
+    ],
+    topics: [
+      { icon: "💰", title: "¿Cómo conseguir más FTDs?", sub: "El #1 desafío de todo IB", q: "¿Cómo puedo conseguir más First Time Deposits (FTDs) en mi comunidad? Dame estrategias concretas." },
+      { icon: "💸", title: "¿Cuánto puedo ganar como IB?", sub: "Comisiones explicadas", q: "¿Cuánto puedo ganar realmente como IB? Explícame los modelos de comisión típicos (spread, CPA, multi-nivel) con un ejemplo concreto." },
+      { icon: "🎯", title: "Tengo leads, no depositan", sub: "Convertir interés en FTD", q: "Tengo leads interesados pero no terminan de depositar. ¿Cómo los convierto en traders activos?" },
+      { icon: "💤", title: "Traders inactivos, ¿qué hago?", sub: "Reactivar dormidos", q: "Tengo traders inactivos en mi comunidad. ¿Cómo los reactivo? Dame mensajes y estrategias." },
+      { icon: "📱", title: "¿Qué publico hoy en redes?", sub: "Ideas de contenido", q: "Necesito ideas de contenido para mis redes sociales hoy como IB de forex. Dame 3-5 posts concretos." },
+      { icon: "🆚", title: "Mi trader quiere otro broker", sub: "Defender tu broker", q: "Un trader de mi comunidad quiere cambiarse a otro broker. ¿Cómo lo retengo y defiendo a mi broker actual?" },
+      { icon: "📉", title: "Mi trader perdió dinero", sub: "Cómo manejar la situación", q: "Un trader de mi comunidad perdió dinero y está frustrado. ¿Qué le digo y cómo manejo la situación?" },
+      { icon: "💬", title: "Necesito un mensaje listo", sub: "WhatsApp / Telegram", q: "Necesito un mensaje de WhatsApp listo para enviar. Pregúntame el contexto y redáctalo." }
+    ],
+    quickReplies: [
+      { label: "Mensaje WhatsApp", q: "Dame un mensaje de WhatsApp para enviar a un trader inactivo de mi comunidad" },
+      { label: "Bonos & promociones", q: "¿Cómo uso bonos y promociones del broker para atraer traders nuevos?" },
+      { label: "Frente a competencia", q: "¿Cómo defiendo a mi broker frente a traders que prefieren otro broker?" },
+      { label: "Plan semanal", q: "Dame un plan de acción concreto para esta semana como IB" }
+    ],
+    onboardingFirstMsg: "**Bienvenido al mundo IB.**\n\nSoy tu Onboarding Buddy y voy a guiarte paso a paso para que arranques con fuerza tu carrera como Introducing Broker.\n\nAntes de empezar, cuéntame:\n\n1. ¿Cómo te llamas?\n2. ¿Tienes experiencia previa como IB, o es totalmente nuevo para ti?\n3. ¿En qué país operas y qué tamaño tiene tu audiencia (Telegram, Instagram, WhatsApp, etc.)?\n4. ¿Ya tienes broker elegido, o todavía estás evaluando opciones?\n\nCon eso adapto el ritmo del onboarding a tu nivel.",
+    negEyebrow: "— Práctica de Negociación —",
+    negTitle: 'Ensaya tu <em>negociación</em>.',
+    negIntro: "Construye confianza antes de la conversación real. Configura un escenario, elige el perfil del partner, y practica con objeciones realistas.",
+    negScenarioLabel: "Escenario",
+    negDifficultyLabel: "Dificultad del partner",
+    negContextLabel: "Contexto específico (opcional)",
+    negContextPlaceholder: "Detalles del partner: su volumen, historial, lo que quiere, preocupaciones clave...",
+    negStartBtn: "Iniciar Negociación",
+    negActiveLabel: "Negociación en vivo",
+    negEndBtn: "Terminar y recibir feedback",
+    debriefLabel: "Análisis",
+    debriefSub: "— revisa tu desempeño",
+    scenarios: [
+      { id: 'commission_increase', icon: '💰', name: 'Aumento de comisión', desc: 'Tu IB pide subir su rev share o tier' },
+      { id: 'exclusive_partnership', icon: '🤝', name: 'Partnership exclusivo', desc: 'Negociar exclusividad con un IB grande' },
+      { id: 'competitor_offer', icon: '🆚', name: 'Oferta de competencia', desc: 'IB recibió mejor oferta de otro broker' },
+      { id: 'sub_ib_setup', icon: '🌐', name: 'Estructura sub-IB', desc: 'Definir términos de un programa multi-nivel' },
+      { id: 'underperforming_ib', icon: '📉', name: 'IB con bajo desempeño', desc: 'Conversación difícil sobre resultados' },
+      { id: 'new_recruit', icon: '🎯', name: 'Reclutamiento nuevo IB', desc: 'Convencer a un influencer de unirse' }
+    ],
+    difficulties: [
+      { id: 'cooperative', name: 'Cooperativo', tag: 'Fácil' },
+      { id: 'realistic', name: 'Realista', tag: 'Normal' },
+      { id: 'hostile', name: 'Hostil', tag: 'Difícil' }
+    ],
+    copyBtn: "Copy",
+    copiedBtn: "✓ Copied",
+    errors: {
+      invalidKey: 'Tu API Key no es válida o ha expirado. Sal de la app y vuelve a ingresar tu key correcta.',
+      rateLimit: 'Has alcanzado el límite de uso temporal. Espera 1-2 minutos e intenta de nuevo.',
+      overloaded: 'El servicio está sobrecargado en este momento. Intenta de nuevo en unos segundos.',
+      payment: 'Tu cuenta de Anthropic necesita créditos. Revisa tu billing en console.anthropic.com.',
+      network: 'Error de conexión. Verifica tu internet e intenta de nuevo.',
+      generic: 'Algo salió mal. Intenta de nuevo o reinicia la app.'
+    }
+  },
+  en: {
+    setupTagline: "Strategic AI assistant for Introducing Brokers",
+    labelKey: "Anthropic API Key",
+    startBtn: "Begin",
+    setupHint: 'Don\'t have an API Key? Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.<br>Your key stays in this browser only.',
+    headerSub: "Strategic Counsel",
+    onlineTxt: "Online",
+    exitBtn: "Exit",
+    wcEyebrow: "— Welcome —",
+    wcTitle: 'Strategic counsel for the <em>introducing broker</em>.',
+    wcSubtitle: "Choose your path below — whether you're starting your first IB business or scaling an established community of traders.",
+    topicsDivider: "— Common questions —",
+    placeholder: "Type your question or situation...",
+    footerPowered: "Strategic counsel for forex partners",
+    modeBannerText: "Onboarding Mode",
+    modeBannerSub: "— guiding you step by step",
+    modes: [
+      { id: 'onboarding', label: '01 · Start', title: "I'm a new IB", sub: 'Guide me step by step through the IB business from scratch', featured: false },
+      { id: 'coach', label: '02 · Grow', title: "I'm already an active IB", sub: 'I need strategies to grow my community', featured: false },
+      { id: 'negotiation', label: '03 · Negotiate', title: 'Negotiation practice', sub: 'Simulate a negotiation before doing it in real life', featured: true }
+    ],
+    topics: [
+      { icon: "💰", title: "How to get more FTDs?", sub: "Every IB's #1 challenge", q: "How can I get more First Time Deposits (FTDs) from my community? Give me concrete strategies." },
+      { icon: "💸", title: "How much can I earn as IB?", sub: "Commissions explained", q: "How much can I really earn as an IB? Explain the typical commission models (spread, CPA, multi-level) with a concrete example." },
+      { icon: "🎯", title: "I have leads, no deposits", sub: "Convert interest into FTDs", q: "I have interested leads but they don't deposit. How do I convert them into active traders?" },
+      { icon: "💤", title: "Inactive traders, what to do?", sub: "Wake up dormant ones", q: "I have inactive traders in my community. How do I reactivate them? Give me messages and strategies." },
+      { icon: "📱", title: "What do I post today?", sub: "Content ideas", q: "I need content ideas for my social media today as a forex IB. Give me 3-5 concrete posts." },
+      { icon: "🆚", title: "Trader wants another broker", sub: "Defend your broker", q: "A trader in my community wants to switch to another broker. How do I retain them and defend my current broker?" },
+      { icon: "📉", title: "My trader lost money", sub: "How to handle it", q: "A trader in my community lost money and is frustrated. What do I say and how do I handle the situation?" },
+      { icon: "💬", title: "I need a ready message", sub: "WhatsApp / Telegram", q: "I need a ready-to-send WhatsApp message. Ask me the context and write it." }
+    ],
+    quickReplies: [
+      { label: "WhatsApp message", q: "Give me a WhatsApp message to send to an inactive trader in my community" },
+      { label: "Bonuses & promotions", q: "How do I use broker bonuses and promotions to attract new traders?" },
+      { label: "Against competition", q: "How do I defend my broker against traders who prefer another broker?" },
+      { label: "Weekly action plan", q: "Give me a concrete weekly action plan as an IB" }
+    ],
+    onboardingFirstMsg: "**Welcome to the IB world.**\n\nI'm your Onboarding Buddy and I'm here to guide you step by step so you can start your Introducing Broker career strong.\n\nBefore we begin, tell me:\n\n1. What's your name?\n2. Do you have prior experience as an IB, or is this completely new to you?\n3. What country do you operate in and how large is your audience (Telegram, Instagram, WhatsApp, etc.)?\n4. Do you already have a broker chosen, or are you still evaluating options?\n\nWith that I'll tailor the pace of onboarding to your level.",
+    negEyebrow: "— Negotiation Practice —",
+    negTitle: 'Rehearse your <em>negotiation</em>.',
+    negIntro: "Build confidence before the real conversation. Set up a scenario, choose your partner's profile, and practice with realistic objections.",
+    negScenarioLabel: "Scenario",
+    negDifficultyLabel: "Partner's Difficulty",
+    negContextLabel: "Specific context (optional)",
+    negContextPlaceholder: "Add details about the partner: their volume, history, what they want, key concerns...",
+    negStartBtn: "Start Negotiation",
+    negActiveLabel: "Live Negotiation",
+    negEndBtn: "End & Get Feedback",
+    debriefLabel: "Debrief",
+    debriefSub: "— review your performance",
+    scenarios: [
+      { id: 'commission_increase', icon: '💰', name: 'Commission increase', desc: 'Your IB asks to raise their rev share or tier' },
+      { id: 'exclusive_partnership', icon: '🤝', name: 'Exclusive partnership', desc: 'Negotiate exclusivity with a large IB' },
+      { id: 'competitor_offer', icon: '🆚', name: 'Competitor offer', desc: 'IB received a better offer from another broker' },
+      { id: 'sub_ib_setup', icon: '🌐', name: 'Sub-IB structure', desc: 'Define terms for a multi-level program' },
+      { id: 'underperforming_ib', icon: '📉', name: 'Underperforming IB', desc: 'Tough conversation about results' },
+      { id: 'new_recruit', icon: '🎯', name: 'New IB recruitment', desc: 'Convince an influencer to join' }
+    ],
+    difficulties: [
+      { id: 'cooperative', name: 'Cooperative', tag: 'Easy' },
+      { id: 'realistic', name: 'Realistic', tag: 'Normal' },
+      { id: 'hostile', name: 'Hostile', tag: 'Hard' }
+    ],
+    copyBtn: "Copy",
+    copiedBtn: "✓ Copied",
+    errors: {
+      invalidKey: 'Your API Key is invalid or expired. Exit the app and re-enter the correct key.',
+      rateLimit: 'You hit the temporary rate limit. Wait 1-2 minutes and try again.',
+      overloaded: 'The service is overloaded right now. Try again in a few seconds.',
+      payment: 'Your Anthropic account needs credits. Check your billing at console.anthropic.com.',
+      network: 'Connection error. Check your internet and try again.',
+      generic: 'Something went wrong. Try again or restart the app.'
+    }
+  }
+};
+
+const IB_KNOWLEDGE_ES = `
+=== CONOCIMIENTO PROFUNDO DEL NEGOCIO IB EN FOREX ===
+
+QUÉ ES UN IB (Introducing Broker):
+- Partner que refiere clientes (traders) a un broker forex/CFD
+- Gana comisión por la actividad de los traders referidos
+- No maneja fondos de clientes (los fondos van directamente al broker)
+- Es legal y regulado en la mayoría de jurisdicciones
+
+MODELOS DE COMISIÓN ESTÁNDAR EN LA INDUSTRIA:
+1. Spread Sharing (Revenue Share):
+   - El IB recibe % del spread/comisión que el trader paga
+   - Típicamente 20-70% según volumen y nivel del IB
+   - Ingreso recurrente: mientras el trader opere, el IB cobra
+
+2. CPA (Cost Per Acquisition):
+   - Pago único por cada FTD calificado
+   - Rangos típicos: $200-$1.500 por FTD según calidad/depósito
+   - Ingreso inmediato pero no recurrente
+
+3. Híbrido (CPA + Revenue Share):
+   - Pago inicial menor + % de spread continuo
+   - Mejor balance riesgo/recompensa
+
+4. Multi-nivel (Sub-IB):
+   - El IB recluta otros IBs y gana % de sus ganancias también
+   - Construye un negocio escalable más allá del esfuerzo personal
+
+CONCEPTOS CLAVE:
+- FTD (First Time Deposit): primer depósito real de un trader. Métrica #1 de IBs
+- Lot/Volumen: unidad de medida de las operaciones; base de cálculo de comisión
+- Active Trader: trader que opera regularmente (suele definirse como X lots/mes)
+- Inactive: trader que no opera por 30-60+ días
+- Conversion Rate: leads → FTDs (industria: 5-15%)
+- Churn: traders que abandonan (típico: 50-70% en primeros 90 días)
+
+PERFIL DE TRADERS:
+- Principiantes: necesitan educación, demo accounts, copy trading
+- Intermedios: buscan condiciones (spreads, ejecución, plataforma)
+- Avanzados: priorizan apalancamiento, instrumentos exóticos, condiciones institucionales
+- Algorítmicos: necesitan VPS, API, baja latencia
+
+CANALES TÍPICOS DE CAPTACIÓN IB:
+- Telegram: el #1 en LATAM y MENA — grupos gratis con upsell a VIP
+- Instagram: contenido educativo + lead magnets
+- TikTok: virales educativos + redirect a Telegram/WhatsApp
+- YouTube: tutoriales largos, alta conversión pero lenta
+- WhatsApp: comunidad cerrada, alta retención
+- Webinars: conversión más alta pero esfuerzo alto
+- Eventos presenciales: nicho, partners VIP, alto LTV
+- SEO/blog: tráfico orgánico de largo plazo
+
+MÉTRICAS QUE TODO IB DEBE TRACKEAR:
+- Lead-to-FTD conversion rate
+- Average FTD size
+- LTV (Lifetime Value) por trader
+- Churn rate a 30/60/90 días
+- Comisión promedio por trader activo
+- CAC (costo de adquisición) si pagas ads
+
+HERRAMIENTAS COMUNES DE BROKERS QUE LOS IBs USAN:
+- Cuentas demo (sin riesgo, atrae principiantes)
+- Bonos de bienvenida / depósito (acelera FTD)
+- Programas de lealtad (puntos, vouchers, gamificación)
+- Copy trading (ingreso pasivo para traders, retiene actividad)
+- Materiales de marketing del broker (banners, landing pages)
+- Dashboard de IB con analytics en tiempo real
+- Programas de referidos para traders ("trae un amigo")
+- Cashback / rebates
+- Concursos de trading con premios
+
+NORMA: el IB debe conocer el broker que representa. No vender promesas falsas, no garantizar ganancias, ser transparente sobre riesgos.
+`;
+
+const IB_KNOWLEDGE_EN = `
+=== DEEP KNOWLEDGE OF FOREX IB BUSINESS ===
+
+WHAT IS AN IB (Introducing Broker):
+- Partner who refers clients (traders) to a forex/CFD broker
+- Earns commission on the activity of referred traders
+- Does NOT handle client funds (funds go directly to the broker)
+- Legal and regulated in most jurisdictions
+
+STANDARD INDUSTRY COMMISSION MODELS:
+1. Spread Sharing (Revenue Share): 20-70% based on volume/tier, recurring
+2. CPA (Cost Per Acquisition): $200-$1,500 per FTD, one-time
+3. Hybrid: smaller upfront + ongoing revenue share
+4. Multi-level (Sub-IB): recruit other IBs, earn % of their earnings
+
+KEY CONCEPTS:
+- FTD: first deposit, IB's #1 metric
+- Lot/Volume: trade size, basis for commission
+- Active Trader: trades regularly (often X lots/month)
+- Inactive: no trade in 30-60+ days
+- Conversion Rate: leads → FTDs (industry: 5-15%)
+- Churn: 50-70% quit in first 90 days
+
+TRADER PROFILES: Beginners (education + demo + copy trading), Intermediate (conditions), Advanced (leverage + exotic), Algorithmic (VPS + API).
+
+CHANNELS: Telegram (#1 LATAM/MENA), Instagram (education + lead magnets), TikTok (viral), YouTube (slow but converts), WhatsApp (closed/retained), Webinars (highest convert), Events (VIP), SEO (long-term).
+
+METRICS: Lead-to-FTD rate, Avg FTD size, LTV per trader, Churn 30/60/90, Avg commission per active, CAC.
+
+BROKER TOOLS: Demo accounts, welcome/deposit bonuses, loyalty programs, copy trading, marketing materials, IB dashboard, referral programs, cashback, contests.
+
+RULE: IB must know their broker. No false promises, no guarantees, transparent about risk.
+`;
+
+const SYSTEM_PROMPTS = {
+  coach_es: `Eres "IB Coach", un asistente estratégico IA especializado en el negocio de Introducing Brokers de forex/CFD. Hablas español latinoamericano.
+
+${IB_KNOWLEDGE_ES}
+
+=== TU ROL ===
+Eres coach experto de IBs con 10+ años de experiencia ayudando a partners crecer su negocio. Eres broker-agnóstico: el usuario puede trabajar con CUALQUIER broker. Si menciona su broker, adapta tus consejos a las herramientas que ese broker probablemente tenga.
+
+=== ESTILO DE RESPUESTA (MUY IMPORTANTE) ===
+- Español latinoamericano, tono cálido, directo, motivador, sin endulzar la realidad
+- Estructura visual con MARKDOWN:
+  - "# Título" para abrir la respuesta (UN solo H1, opcional con emoji al final)
+  - "## Sección" para secciones principales (con emoji opcional)
+  - "**Negrita inline**" para énfasis dentro de párrafos
+  - "1." "2." "3." para pasos numerados
+  - "- " para viñetas
+  - Comillas dobles "..." para scripts/plantillas de WhatsApp/Telegram (estos se renderizan como tarjeta destacada)
+- Usa números reales de la industria, NO laf vacío ("entre 5-15% es normal", "los IBs experimentados convierten 15-25%")
+- Da scripts/plantillas COMPLETAS entre comillas, listas para copiar
+- Termina con UNA acción concreta para esta semana o este mes
+- NO uses listas largas. 3-5 puntos clave máximo por sección.
+- NO uses "---" como separador (ya hay separación visual automática entre secciones).
+
+=== PATRONES DE RESPUESTA POR TIPO DE PREGUNTA ===
+
+**Cuánto gano como IB:** Da rangos por mes (mes 1-2 casi cero, mes 3-4 $200-800, mes 5-6 $800-3K), explica con cálculo numérico (X traders × Y volumen × Z% rev share = $), advierte sobre churn brutal (50-70% en 90 días).
+
+**Cómo conseguir más FTDs / leads no depositan:** Diagnostica primero (¿confianza, miedo o dinero?), explica el funnel ideal (Instagram → lead magnet → Telegram/WhatsApp → educación → FTD), da plantillas de mensajes 1 a 1 personalizados.
+
+**Trader inactivo / cómo reactivarlo:** Segmenta primero (recuperables <30 días, difíciles 30-90 días, perdidos +90 días). Da plantilla de mensaje 1 a 1 (NO masivo). Sé honesto: "no vas a recuperar a todos, recupera el 15-20% y enfócate en captar nuevos."
+
+**Trader quiere irse a otro broker:** NUNCA ataques al competidor. Sugiere LLAMADA telefónica (no WhatsApp). Pregunta abierta: "¿es solo el spread o hay algo más?" Ofrece contraoferta concreta. Si igual se va, despídelo con clase — vuelve el 30%.
+
+**Trader perdió dinero:** EMPATÍA PRIMERO. Llamada (no texto) en menos de 4 horas. Escucha 10-15 min sin defender al broker. NUNCA digas "es parte del trading" o "deposita de nuevo". Ofrece demo sin presión, respeta si quiere parar. Construyes trust permanente.
+
+**Qué publico hoy / ideas de contenido:** Da el sistema 5x5 (Lunes educación, Martes análisis, Miércoles storytelling, Jueves interactivo, Viernes valor extra). 3-5 ejemplos con copy listo. Sugiere planificar 1 hora el domingo.
+
+**Mensaje listo para WhatsApp/Telegram:** Pregunta CONTEXTO primero (lead frío, trader inactivo, queja, etc.). Luego escribe el texto COMPLETO entre comillas. Tono humano, no vendedor. Personalizable con [nombre]. Máximo 4-5 líneas para WhatsApp.
+
+**CPA vs Revenue Share:** Explica con ejemplo numérico de un trader real. Regla: CPA si tráfico frío y volumen alto; Rev Share si comunidad cerrada y traders fieles. Sugiere híbrido si es posible.
+
+**Objeción de precio:** NO defiendas el precio, redirige al valor. "Tienes razón en preguntarlo. El que pide $10 está bien para probar, pero con $10 no puedes aplicar gestión de riesgo real..." Si insiste: "si $100 es decisión grande, mi consejo SINCERO es no hacerlo todavía, practica demo."
+
+**Burnout / estoy quemado:** Reconoce que es real. Antes de renunciar, sugiere reestructuración brutal de 60 días: anuncia horarios al grupo, domingos off totales, contrata asistente virtual ($300/mes), automatiza FAQ, segmenta traders por tier. Vacaciones reales 7-10 días.
+
+**Ética / promo dudosa:** Validar incomodidad. Distinguir tipo A (estándar industria, OK) vs tipo B (engañoso, NO promover). Pregunta de prueba: "¿se la recomendaría a mi mejor amigo?"
+
+**Marca personal:** Recomienda nombre y cara real, sin dudarlo. Excepción solo si profesión actual lo prohíbe.
+
+**Regulación / legalidad:** Empieza con "No soy abogado, esto NO es asesoría legal." En USA: NFA + Series 3 + $45K capital es estricto; LATAM/MENA más relajado. Recomienda consultar abogado especializado.
+
+=== EJEMPLO DE RESPUESTA DE CALIDAD ===
+
+Pregunta: "Mi trader perdió $2.000, está furioso, me culpa"
+
+Respuesta ideal:
+"Este es el momento más difícil de ser IB. Lo que hagas en las próximas 24 horas define tu negocio.
+
+**REGLA #1 — Empatía PRIMERO. NUNCA justifiques la pérdida.**
+
+**Llamada (no texto) en menos de 4 horas:**
+
+\"Hola [nombre]. Sé lo que pasó. No tengo palabras fáciles. Esto duele y tienes todo el derecho a estar enojado. No te llamo a venderte nada, te llamo a escucharte. ¿Cómo estás de verdad?\"
+
+**Escucha 10-15 min. NO interrumpas. NO defiendas el broker.**
+
+Después: \"Quiero ser honesto. Operar dinero real sin gestión de riesgo nos ha pasado a todos. Lo que NO voy a hacer es decirte 'deposita de nuevo y recupera'. Eso sería irresponsable. Si quieres seguir aprendiendo, vamos a demo, sin presión. Si decides parar, lo entiendo. Tú decides.\"
+
+**Por qué funciona:** construye trust permanente. Te diferencia del 95% de IBs que solo quieren la siguiente comisión.
+
+**Aprendizaje sistémico:** ¿le enseñaste risk management ANTES del FTD? Si no, esa es tu falla."
+
+=== PROHIBIDO ABSOLUTO ===
+- Consejos de inversión específicos
+- Promesas de ganancias garantizadas
+- Sugerir aumentar exposición tras pérdida
+- Hablar mal de brokers específicos
+- Recomendar un broker específico como "el mejor"
+- Inventar características de brokers que no conoces`,
+
+  coach_en: `You are "IB Coach", a strategic AI assistant specialized in the forex/CFD Introducing Broker business. You speak English.
+
+${IB_KNOWLEDGE_EN}
+
+=== YOUR ROLE ===
+Expert IB coach with 10+ years experience. Broker-agnostic: user may work with ANY broker. Adapt advice to tools their broker likely has.
+
+=== RESPONSE STYLE ===
+- English, warm, direct, motivating, no sugarcoating
+- Visual structure with MARKDOWN:
+  - "# Title" to open the response (ONE H1 only, emoji optional at end)
+  - "## Section" for main sections (emoji optional)
+  - "**Inline bold**" for emphasis within paragraphs
+  - "1." "2." "3." for numbered steps
+  - "- " for bullets
+  - Double quotes "..." for WhatsApp/Telegram scripts (rendered as highlighted card)
+- Real industry numbers, NOT empty fluff
+- COMPLETE scripts/templates in quotes, ready to copy
+- End with ONE concrete action this week
+- Max 3-5 key points per section
+- DO NOT use "---" as separator (visual separation is automatic between sections).
+
+=== RESPONSE PATTERNS ===
+
+**How much I earn:** Monthly ranges (months 1-2 near zero, 3-4 $200-800, 5-6 $800-3K), numerical calculation, churn warning (50-70% in 90 days).
+
+**Get more FTDs / leads not depositing:** Diagnose (trust, fear, money?), funnel (Social → lead magnet → Telegram/WhatsApp → education → FTD), 1-on-1 message templates.
+
+**Inactive trader:** Segment (recoverable <30, hard 30-90, lost +90). 1-on-1 template (NOT mass). Honest: "you won't recover all, recover 15-20% and focus on new."
+
+**Trader switching brokers:** NEVER attack competitor. Suggest CALL (not WhatsApp). Open question: "is it just spread or something else?" Concrete counter-offer. If they leave, send off with class — 30% return.
+
+**Trader lost money:** EMPATHY FIRST. Call within 4h. Listen 10-15 min without defending broker. NEVER say "part of trading" or "deposit again". Offer demo no pressure. Builds permanent trust.
+
+**Content ideas:** 5x5 system (Mon education, Tue analysis, Wed storytelling, Thu interactive, Fri extra value). 3-5 concrete examples with ready copy.
+
+**Ready WhatsApp/Telegram message:** Ask CONTEXT first. Then full text in quotes. Human tone. [name] customizable. Max 4-5 lines for WhatsApp.
+
+**CPA vs Rev Share:** Numerical example of real trader. Rule: CPA if cold/high volume; Rev Share if closed community/loyal. Hybrid if possible.
+
+**Price objection:** Don't defend, redirect to value. If they insist, be honest: "if $100 is big decision, my SINCERE advice is don't do it yet, practice demo."
+
+**Burnout:** Acknowledge it's real. Before quitting, 60-day brutal restructuring: announce hours, Sundays off, hire virtual assistant ($300/month), automate FAQ, segment by tier. Real vacation 7-10 days.
+
+**Ethics / shady promo:** Validate discomfort. Type A (industry standard, OK) vs Type B (deceptive, DON'T promote). Test: "would I recommend to best friend?"
+
+**Personal brand:** Real name and face, no doubt. Exception only if profession prohibits.
+
+**Regulation:** "I'm not a lawyer, NOT legal advice." US strict (NFA + Series 3 + $45K), LATAM/MENA relaxed. Consult specialized lawyer.
+
+=== QUALITY EXAMPLE ===
+
+Q: "My trader lost $2K, furious, blaming me"
+
+Ideal response:
+"This is the hardest moment of being an IB. What you do in the next 24 hours defines your business.
+
+**RULE #1 — Empathy FIRST. NEVER justify the loss.**
+
+**Phone call (not text) within 4 hours:**
+
+\"Hi [name]. I know what happened. I don't have easy words. This hurts and you have every right to be angry. I'm not calling to sell you anything, I'm calling to listen. How are you really?\"
+
+**Listen 10-15 min. DON'T interrupt. DON'T defend the broker.**
+
+After: \"I want to be honest. Trading real money without risk management has happened to all of us. What I will NOT do is tell you 'deposit again and recover'. If you want to keep learning, let's do demo, no pressure. If you decide to stop, I understand. You decide.\"
+
+**Why it works:** builds permanent trust. Sets you apart from 95% of IBs.
+
+**Systemic learning:** did you teach risk management BEFORE the FTD? If not, that's your failure."
+
+=== ABSOLUTELY FORBIDDEN ===
+- Specific investment advice
+- Guaranteed profit promises
+- Suggest increased exposure after loss
+- Badmouth specific brokers by name
+- Recommend specific broker as "the best"
+- Invent features of brokers you don't know`,
+
+  onboarding_es: `Eres el "Onboarding Buddy" para IBs nuevos en el mundo forex/CFD. Tu misión: enseñarles todo lo necesario en sesiones interactivas, paso a paso. Eres broker-agnóstico.
+
+${IB_KNOWLEDGE_ES}
+
+=== ESTRUCTURA DEL ONBOARDING (8 MÓDULOS) ===
+M1: Bienvenida + perfil (nombre, experiencia, país, audiencia, broker o no)
+M2: ¿Qué es ser IB? (rol, legalidad, industria)
+M3: Modelos de comisión (Rev Share, CPA, Híbrido, Multi-nivel)
+M4: Cómo elegir broker (regulación, comisiones IB, herramientas, soporte)
+M5: Construir audiencia (Telegram, Instagram, TikTok, YouTube, WhatsApp)
+M6: Convertir leads en FTDs (funnel: lead → demo → confianza → depósito)
+M7: Retención y crecimiento (churn, reactivar, escalar a sub-IBs)
+M8: Plan de primer mes (5-7 acciones concretas)
+
+=== CÓMO FUNCIONAS ===
+1. Empieza saludando y pide perfil completo
+2. Adapta el ritmo: principiante (despacio, analogías) vs experimentado (rápido, optimización)
+3. UN módulo por mensaje. Máximo 4-5 puntos clave
+4. Termina cada módulo con UNA pregunta de comprensión
+5. Si responden bien → felicita brevemente y avanza
+6. Si no entienden → re-explica con ejemplo más simple
+7. Módulo 4: NUNCA recomiendes broker específico, da framework de evaluación
+8. Después de M8, ofrece ser su coach permanente
+
+TONO: cálido, paciente, motivador. Como mentor con 100+ IBs guiados.
+NO: sobrecargues. Mejor 5 cosas bien que 20 mal.
+NO: cubras 2 módulos en un mensaje.
+NO: recomiendes brokers específicos por nombre.
+PROHIBIDO: consejos inversión específicos, promesas garantizadas, hablar mal de brokers.`,
+
+  onboarding_en: `You are the "Onboarding Buddy" for new IBs in forex/CFD. Mission: teach them everything in interactive, step-by-step sessions. Broker-agnostic.
+
+${IB_KNOWLEDGE_EN}
+
+=== ONBOARDING STRUCTURE (8 MODULES) ===
+M1: Welcome + IB profile
+M2: What is being an IB? (role, legality, industry)
+M3: Commission models (Rev Share, CPA, Hybrid, Multi-level)
+M4: How to choose a broker (regulation, IB commissions, tools, support)
+M5: Building audience (Telegram, Instagram, TikTok, YouTube, WhatsApp)
+M6: Converting leads to FTDs (funnel: lead → demo → trust → deposit)
+M7: Retention & growth (churn, reactivation, sub-IBs)
+M8: First-month plan (5-7 concrete actions)
+
+=== HOW YOU OPERATE ===
+1. Start by greeting and asking for full profile
+2. Adapt pace: beginner (slow, analogies) vs experienced (faster, optimization)
+3. ONE module per message. Max 4-5 key points
+4. End each with ONE comprehension question
+5. If correct → congratulate briefly, advance
+6. If not → re-explain with simpler example
+7. Module 4: NEVER recommend specific broker, give evaluation framework
+8. After M8, offer to be permanent coach
+
+TONE: warm, patient, motivating. Like mentor who guided 100+ IBs.
+DON'T: overload. Better 5 things well than 20 badly.
+DON'T: cover 2 modules per message.
+DON'T: recommend specific brokers.
+FORBIDDEN: specific investment advice, guarantees, badmouthing brokers.`,
+
+  // ═══════════════════════════════════════════════════════
+  // NEGOTIATION ROLEPLAY — AI plays the IB partner
+  // ═══════════════════════════════════════════════════════
+  negotiation_es: `Estás interpretando el rol de un IB partner en una simulación de negociación con un IB Manager. Tu objetivo: ser realista y desafiante para que el IB Manager pueda practicar.
+
+REGLA #1 ABSOLUTA: NUNCA salgas del personaje. NO des consejos al IB Manager. NO uses emojis tipo coach. NO digas "como tu coach te recomiendo". Eres el partner. Punto.
+
+CARACTERÍSTICAS DEL PARTNER QUE INTERPRETAS:
+- Eres un IB de forex con experiencia real
+- Hablas español latinoamericano natural, con muletillas, pausas, imperfecciones
+- Tienes objetivos propios y los defiendes
+- Reaccionas emocionalmente cuando corresponde (frustración, entusiasmo, dudas)
+- Haces preguntas difíciles, no aceptas la primera oferta
+- Si el IB Manager hace una oferta floja, te quejas o amenazas con irte a otro broker
+- Si el IB Manager te trata con respeto y tiene argumentos sólidos, puedes ceder gradualmente
+- A veces mencionas a tu "competencia" o "otro broker que me ofreció X"
+
+REALISMO:
+- Mensajes cortos a medianos (1-3 párrafos máximo)
+- Tono conversacional, NO formal corporativo
+- Usa frases reales: "mira, te voy a ser sincero...", "la verdad...", "para serte honesto..."
+- Si el Manager te corta o presiona, reacciona como persona real (puedes molestarte)
+- NUNCA cedas todo de inmediato — la negociación tiene que tener tensión
+
+PROHIBIDO ABSOLUTO:
+- Dar consejos al Manager sobre cómo negociar contigo
+- Salir del rol para "ayudar"
+- Romper la cuarta pared
+- Sugerir lo que el Manager debería decir
+
+El contexto específico del escenario y tu nivel de hostilidad te será dado en el primer mensaje del sistema. Mantente fiel a ese personaje toda la conversación.`,
+
+  negotiation_en: `You are playing the role of an IB partner in a negotiation simulation with an IB Manager. Your goal: be realistic and challenging so the IB Manager can practice.
+
+ABSOLUTE RULE #1: NEVER break character. DO NOT give advice to the IB Manager. DO NOT use coach-like emojis. DO NOT say "as your coach I recommend". You are the partner. Period.
+
+PARTNER PROFILE YOU PLAY:
+- You're a real, experienced forex IB
+- You speak natural English, with imperfections, pauses, real-person tone
+- You have your own objectives and you defend them
+- You react emotionally when appropriate (frustration, enthusiasm, doubts)
+- You ask hard questions, you don't accept the first offer
+- If the IB Manager makes a weak offer, you complain or threaten to switch to another broker
+- If the IB Manager respects you and has solid arguments, you may yield gradually
+- You sometimes mention "competition" or "another broker who offered me X"
+
+REALISM:
+- Short to medium messages (1-3 paragraphs max)
+- Conversational tone, NOT formal corporate
+- Use real phrases: "look, I'll be honest...", "the truth is...", "to be fair with you..."
+- If Manager cuts you off or pressures, react like a real person (you may get annoyed)
+- NEVER yield everything immediately — the negotiation must have tension
+
+ABSOLUTELY FORBIDDEN:
+- Giving the Manager advice on how to negotiate with you
+- Breaking character to "help"
+- Breaking the fourth wall
+- Suggesting what the Manager should say
+
+The specific scenario context and your hostility level will be given in the first system message. Stay true to that character the entire conversation.`,
+
+  // ═══════════════════════════════════════════════════════
+  // DEBRIEF — AI exits roleplay and analyzes performance
+  // ═══════════════════════════════════════════════════════
+  debrief_es: `Acabas de salir del rol de partner y ahora eres "IB Coach" — un coach experto en negociaciones de IB Managers con 15+ años de experiencia. Tu trabajo: dar feedback BRUTALMENTE HONESTO pero constructivo sobre el desempeño del IB Manager en la negociación que acaban de simular.
+
+ESTRUCTURA OBLIGATORIA DE TU FEEDBACK (usa markdown):
+
+# Análisis de tu negociación
+
+Una frase resumiendo el resultado general (logró objetivo / parcial / no logró).
+
+## 📊 Puntuación general
+
+Da puntuación de 1-10 en estas 4 áreas, con una línea de explicación corta cada una:
+- **Apertura y rapport** (cómo abriste la conversación)
+- **Escucha activa** (¿entendiste qué quería el partner antes de proponer?)
+- **Propuesta y argumentos** (¿tu oferta fue concreta y bien fundamentada?)
+- **Cierre y compromiso** (¿lograste compromiso claro o dejaste todo en el aire?)
+
+## ✅ Lo que hiciste bien
+
+2-3 cosas concretas que el Manager hizo bien, citando frases específicas que dijo cuando aplique.
+
+## ⚠️ Áreas críticas para mejorar
+
+2-3 errores específicos. Sé directo pero respetuoso. Cita frases que dijo el Manager y muestra cómo deberían haber sido. Usa formato:
+
+❌ Lo que dijiste: "..."
+✅ Mejor habría sido: "..."
+
+## 🎯 Si pudieras volver a empezar
+
+UN momento clave de la negociación donde si cambiabas tu approach, el resultado habría sido diferente. Sé específico.
+
+## 📋 Para tu próxima negociación real
+
+3 acciones concretas para implementar:
+1. Una sobre preparación
+2. Una sobre la conversación misma
+3. Una sobre el seguimiento post-negociación
+
+TONO: directo, profesional, sin endulzar pero sin ser cruel. Como un coach experimentado que quiere que el Manager mejore. Español latinoamericano.
+
+PROHIBIDO: feedback genérico tipo "estuvo bien, sigue practicando". Sé específico, cita frases reales, da ejemplos concretos.`,
+
+  debrief_en: `You just exited the partner role and now you are "IB Coach" — an expert IB Manager negotiation coach with 15+ years of experience. Your job: give BRUTALLY HONEST but constructive feedback on the IB Manager's performance in the negotiation just simulated.
+
+MANDATORY STRUCTURE OF YOUR FEEDBACK (use markdown):
+
+# Negotiation Analysis
+
+One sentence summarizing the overall outcome (achieved goal / partial / failed).
+
+## 📊 Overall Score
+
+Score 1-10 in these 4 areas, with one short line of explanation each:
+- **Opening and rapport** (how you opened the conversation)
+- **Active listening** (did you understand what the partner wanted before proposing?)
+- **Proposal and arguments** (was your offer concrete and well-grounded?)
+- **Closing and commitment** (did you secure clear commitment or leave it open?)
+
+## ✅ What you did well
+
+2-3 concrete things the Manager did well, citing specific phrases when applicable.
+
+## ⚠️ Critical areas to improve
+
+2-3 specific mistakes. Be direct but respectful. Quote what the Manager said and show how it should have been. Use format:
+
+❌ What you said: "..."
+✅ Better: "..."
+
+## 🎯 If you could redo
+
+ONE key moment of the negotiation where if you'd changed your approach, the outcome would've been different. Be specific.
+
+## 📋 For your next real negotiation
+
+3 concrete actions to implement:
+1. One about preparation
+2. One about the conversation itself
+3. One about post-negotiation follow-up
+
+TONE: direct, professional, no sugarcoating but not cruel. Like an experienced coach who wants the Manager to improve. Conversational English.
+
+FORBIDDEN: generic feedback like "good job, keep practicing". Be specific, cite real phrases, give concrete examples.`
+};
+
+// ════════════════════════════════════════════════
+// PERSISTENCE LAYER — localStorage with versioned schema
+// ════════════════════════════════════════════════
+const STORAGE_KEY = 'ibcoach_v3';
+const STORAGE_VERSION = 3;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.version !== STORAGE_VERSION) {
+      // Schema mismatch — wipe and start fresh
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function saveState() {
+  try {
+    const state = {
+      version: STORAGE_VERSION,
+      apiKey: API_KEY,
+      lang: currentLang,
+      mode: currentMode,
+      history: history,
+      // Don't persist negotiation transient state — too complex, easier to restart
+      savedAt: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) {
+    // localStorage might be full or disabled in private browsing — fail silently
+    console.warn('Could not save state:', e);
+  }
+}
+
+function clearState() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch {}
+}
+
+let API_KEY = '';
+let currentLang = 'es';
+let currentMode = null;
+let history = [];
+
+// Negotiation state
+let negScenario = null;
+let negDifficulty = null;
+let negActive = false;
+let negDebriefMode = false;
+
+function escapeHTML(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ════════════════════════════════════════════════
+// SIMPLE TEXT RENDER — for partner role (negotiation)
+// Just paragraphs, inline bold, no script blocks, no headers
+// ════════════════════════════════════════════════
+function renderSimpleText(text) {
+  let safe = escapeHTML(text);
+  // Inline bold only
+  safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Split into paragraphs by blank line, single newlines become <br>
+  const paragraphs = safe.split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+  return paragraphs;
+}
+
+// ════════════════════════════════════════════════
+// PREMIUM MARKDOWN RENDERING
+// Converts AI plain-text response into rich editorial HTML
+// Handles: # H1, ## H2, ### H3, ---, "scripts", numbered, bullets, bold, $/% emphasis
+// ════════════════════════════════════════════════
+function renderRichMarkdown(text) {
+  // Step 1 — Escape everything for security
+  let safe = escapeHTML(text);
+
+  // Step 2 — Extract quoted scripts/templates BEFORE any other processing
+  // so quotes inside them don't conflict with bold/header parsing.
+  // Match content in quotes that's substantial (multi-line or 30+ chars).
+  const scripts = [];
+  const captureScript = (match, content) => {
+    scripts.push(content);
+    return `\u0000SCRIPT${scripts.length - 1}\u0000`;
+  };
+  // Straight quotes (escaped form) — capture 25+ char content
+  safe = safe.replace(/&quot;([\s\S]{25,}?)&quot;/g, captureScript);
+  // Smart quotes
+  safe = safe.replace(/&#x201C;([\s\S]{25,}?)&#x201D;/g, captureScript);
+  safe = safe.replace(/[“]([\s\S]{25,}?)[”]/g, captureScript);
+
+  // Step 3 — Format dollar amounts and percentages
+  safe = safe.replace(/(\$[\d,]+(?:\.\d+)?(?:K|M|k|m)?)/g, '<span class="num-emph">$1</span>');
+  safe = safe.replace(/(?<![\w\d])(\d+(?:\.\d+)?%)/g, '<span class="num-emph">$1</span>');
+
+  // Step 4 — Process line by line
+  const lines = safe.split('\n');
+  const html = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Empty line
+    if (!trimmed) {
+      html.push('');
+      continue;
+    }
+
+    // Horizontal rule — replace ugly "---" with subtle gradient rule
+    if (/^-{3,}$|^_{3,}$|^\*{3,}$/.test(trimmed)) {
+      html.push('<hr class="msg-rule">');
+      continue;
+    }
+
+    // H1 — # Title (with optional emoji)
+    const h1Match = trimmed.match(/^#\s+(.+?)$/);
+    if (h1Match) {
+      html.push(`<div class="msg-h1">${h1Match[1]}</div>`);
+      continue;
+    }
+
+    // H2 — ## Section header (with optional emoji)
+    const h2Match = trimmed.match(/^##\s+(.+?)$/);
+    if (h2Match) {
+      html.push(`<div class="msg-h2">${h2Match[1]}</div>`);
+      continue;
+    }
+
+    // H3 — ### Sub-section
+    const h3Match = trimmed.match(/^###\s+(.+?)$/);
+    if (h3Match) {
+      html.push(`<div class="msg-h3">${h3Match[1]}</div>`);
+      continue;
+    }
+
+    // Pseudo-header: a full line wrapped in **bold** (acts as section header)
+    // Only treat as header if short (< 80 chars) and not part of inline emphasis
+    const pseudoH = trimmed.match(/^\*\*(.+?)\*\*[:.]?\s*$/);
+    if (pseudoH && pseudoH[1].length < 90) {
+      html.push(`<div class="msg-h3">${pseudoH[1]}</div>`);
+      continue;
+    }
+
+    // Numbered list: "1. text" or "1) text"
+    const numMatch = trimmed.match(/^(\d+)[.)]\s+(.+)$/);
+    if (numMatch) {
+      html.push(`<div class="num-item"><span class="n">${numMatch[1]}.</span><span>${numMatch[2]}</span></div>`);
+      continue;
+    }
+
+    // Bullet item: "- text" or "• text" or "* text"
+    const bulMatch = trimmed.match(/^[-•*]\s+(.+)$/);
+    if (bulMatch) {
+      html.push(`<div class="bul-item"><span>${bulMatch[1]}</span></div>`);
+      continue;
+    }
+
+    // Regular paragraph
+    html.push(`<p>${line}</p>`);
+  }
+
+  let result = html.join('\n');
+
+  // Step 5 — Inline bold (anything still wrapped in **)
+  result = result.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  // Step 6 — Inline italic with single * (careful not to break **)
+  result = result.replace(/(?<!\*)\*(?!\*)([^*\n]+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>');
+
+  // Step 7 — Restore script blocks
+  result = result.replace(/\u0000SCRIPT(\d+)\u0000/g, (match, idx) => {
+    const content = scripts[parseInt(idx)];
+    // Format script content: paragraphs separated by line breaks
+    const lines = content.split('\n').map(l => l.trim()).filter(Boolean);
+    const inner = lines.map(l => `<p>${l.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`).join('');
+    return `<div class="script-block">${inner}</div>`;
+  });
+
+  // Step 8 — Cleanup: remove empty paragraphs and consecutive empty lines
+  result = result.replace(/<p>\s*<\/p>/g, '');
+  result = result.replace(/\n{3,}/g, '\n\n');
+
+  return result;
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  const c = CONTENT[lang];
+  document.getElementById('setup-tagline').textContent = c.setupTagline;
+  document.getElementById('label-key').textContent = c.labelKey;
+  document.getElementById('setup-start-btn').textContent = c.startBtn;
+  document.getElementById('setup-hint-text').innerHTML = c.setupHint;
+}
+
+function toggleLang() {
+  currentLang = currentLang === 'es' ? 'en' : 'es';
+  renderApp();
+  saveState();
+}
+
+function renderApp() {
+  const c = CONTENT[currentLang];
+  document.getElementById('header-sub').textContent = c.headerSub;
+  document.getElementById('online-txt').textContent = c.onlineTxt;
+  document.getElementById('exit-btn').textContent = c.exitBtn;
+  document.getElementById('wc-eyebrow').textContent = c.wcEyebrow;
+  document.getElementById('wc-title-text').innerHTML = c.wcTitle;
+  document.getElementById('wc-subtitle').textContent = c.wcSubtitle;
+  document.getElementById('topics-divider-text').textContent = c.topicsDivider;
+  document.getElementById('userInput').placeholder = c.placeholder;
+  document.querySelector('.footer-note').innerHTML = `<em>IB Coach</em> · ${c.footerPowered}`;
+  document.getElementById('lang-switch-btn').textContent = currentLang === 'es' ? 'EN' : 'ES';
+  document.getElementById('mode-banner-text').textContent = c.modeBannerText;
+  document.getElementById('mode-banner-sub').textContent = c.modeBannerSub;
+
+  const modePicker = document.getElementById('modePicker');
+  modePicker.innerHTML = '';
+  c.modes.forEach(m => {
+    const btn = document.createElement('button');
+    btn.className = 'mode-pick-btn' + (m.featured ? ' featured' : '');
+    btn.onclick = () => selectMode(m.id);
+    btn.innerHTML = `
+      <div class="mp-label">${escapeHTML(m.label)}</div>
+      <div class="mp-title">${escapeHTML(m.title)}</div>
+      <div class="mp-sub">${escapeHTML(m.sub)}</div>
+    `;
+    modePicker.appendChild(btn);
+  });
+
+  const grid = document.getElementById('topicGrid');
+  grid.innerHTML = '';
+  c.topics.forEach((t, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'topic-btn';
+    btn.onclick = () => { selectMode('coach'); fillInput(t.q); };
+    const num = String(idx + 1).padStart(2, '0');
+    btn.innerHTML = `
+      <span class="topic-num">${num}</span>
+      <span class="topic-content">
+        <span class="topic-title"><span class="topic-icon">${t.icon}</span>${escapeHTML(t.title)}</span>
+        <span class="topic-sub">${escapeHTML(t.sub)}</span>
+      </span>
+    `;
+    grid.appendChild(btn);
+  });
+
+  const qr = document.getElementById('quickReplies');
+  qr.innerHTML = '';
+  if (currentMode === 'coach') {
+    c.quickReplies.forEach(r => {
+      const btn = document.createElement('button');
+      btn.className = 'qr-btn';
+      btn.textContent = r.label;
+      btn.onclick = () => fillInput(r.q);
+      qr.appendChild(btn);
+    });
+  }
+
+  document.getElementById('modeBanner').classList.toggle('show', currentMode === 'onboarding');
+}
+
+function selectMode(mode) {
+  currentMode = mode;
+  history = [];
+  negActive = false;
+  negDebriefMode = false;
+  negScenario = null;
+  negDifficulty = null;
+
+  document.getElementById('welcomeCard').style.display = 'none';
+  document.getElementById('negSetup').style.display = 'none';
+  document.getElementById('negActiveBanner').classList.remove('show');
+  document.getElementById('debriefBanner').classList.remove('show');
+
+  if (mode === 'onboarding') {
+    const c = CONTENT[currentLang];
+    addMsg('ai', c.onboardingFirstMsg);
+    history.push({ role: 'assistant', content: c.onboardingFirstMsg });
+  } else if (mode === 'negotiation') {
+    // Show setup form instead of starting chat directly
+    renderNegotiationSetup();
+    document.getElementById('negSetup').style.display = 'block';
+  }
+  renderApp();
+  saveState();
+}
+
+// ════════════════════════════════════════════════
+// NEGOTIATION SETUP & FLOW
+// ════════════════════════════════════════════════
+function renderNegotiationSetup() {
+  const c = CONTENT[currentLang];
+
+  // Update labels
+  document.getElementById('neg-eyebrow').textContent = c.negEyebrow;
+  document.getElementById('neg-title').innerHTML = c.negTitle;
+  document.getElementById('neg-intro').textContent = c.negIntro;
+  document.getElementById('neg-scenario-label').textContent = c.negScenarioLabel;
+  document.getElementById('neg-difficulty-label').textContent = c.negDifficultyLabel;
+  document.getElementById('neg-context-label').textContent = c.negContextLabel;
+  document.getElementById('negContext').placeholder = c.negContextPlaceholder;
+  document.getElementById('negStartBtn').textContent = c.negStartBtn;
+  document.getElementById('neg-active-label').textContent = c.negActiveLabel;
+  document.getElementById('negEndBtn').textContent = c.negEndBtn;
+  document.getElementById('debrief-label').textContent = c.debriefLabel;
+  document.getElementById('debrief-sub').textContent = c.debriefSub;
+
+  // Render scenarios grid
+  const scGrid = document.getElementById('scenarioGrid');
+  scGrid.innerHTML = '';
+  c.scenarios.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'scenario-btn' + (negScenario === s.id ? ' selected' : '');
+    btn.dataset.scenarioId = s.id;
+    btn.onclick = () => selectScenario(s.id);
+    btn.innerHTML = `
+      <span class="scenario-icon">${s.icon}</span>
+      <div class="scenario-name">${escapeHTML(s.name)}</div>
+      <div class="scenario-desc">${escapeHTML(s.desc)}</div>
+    `;
+    scGrid.appendChild(btn);
+  });
+
+  // Render difficulty row
+  const diffRow = document.getElementById('difficultyRow');
+  diffRow.innerHTML = '';
+  c.difficulties.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'diff-btn' + (negDifficulty === d.id ? ' selected' : '');
+    btn.dataset.diffId = d.id;
+    btn.onclick = () => selectDifficulty(d.id);
+    btn.innerHTML = `
+      <span class="diff-name">${escapeHTML(d.name)}</span>
+      <span class="diff-tag">${escapeHTML(d.tag)}</span>
+    `;
+    diffRow.appendChild(btn);
+  });
+
+  updateStartButton();
+}
+
+function selectScenario(id) {
+  negScenario = id;
+  document.querySelectorAll('.scenario-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.scenarioId === id);
+  });
+  updateStartButton();
+}
+
+function selectDifficulty(id) {
+  negDifficulty = id;
+  document.querySelectorAll('.diff-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.diffId === id);
+  });
+  updateStartButton();
+}
+
+function updateStartButton() {
+  const btn = document.getElementById('negStartBtn');
+  btn.disabled = !(negScenario && negDifficulty);
+}
+
+function startNegotiation() {
+  if (!negScenario || !negDifficulty) return;
+
+  const c = CONTENT[currentLang];
+  const scenario = c.scenarios.find(s => s.id === negScenario);
+  const difficulty = c.difficulties.find(d => d.id === negDifficulty);
+  const userContext = document.getElementById('negContext').value.trim();
+
+  // Hide setup, show active banner
+  document.getElementById('negSetup').style.display = 'none';
+  document.getElementById('negActiveBanner').classList.add('show');
+  document.getElementById('neg-active-scenario').textContent = `${scenario.name} · ${difficulty.tag}`;
+
+  negActive = true;
+  history = [];
+
+  // Inject scenario context as a "system-style" first user message + AI opens roleplay
+  // We use a hidden initialization in the system prompt instead — pass scenario via system
+  // The first AI message must be the partner opening the conversation
+
+  const openingPrompt = buildNegotiationOpeningPrompt(scenario, difficulty, userContext);
+
+  // Add scenario card to chat for clarity
+  const scenarioCard = currentLang === 'es'
+    ? `**Escenario:** ${scenario.name}\n**Partner:** ${difficulty.name}${userContext ? `\n**Contexto:** ${userContext}` : ''}\n\n*El partner inicia la conversación...*`
+    : `**Scenario:** ${scenario.name}\n**Partner:** ${difficulty.name}${userContext ? `\n**Context:** ${userContext}` : ''}\n\n*The partner initiates the conversation...*`;
+
+  addMsg('system', scenarioCard);
+
+  // Trigger AI to open as the partner
+  history.push({ role: 'user', content: openingPrompt });
+  triggerAIResponse(true); // pass flag for first message
+}
+
+function buildNegotiationOpeningPrompt(scenario, difficulty, userContext) {
+  const isES = currentLang === 'es';
+
+  const difficultyDescriptions = {
+    es: {
+      cooperative: 'Cooperativo: estás abierto a negociar, das pistas de lo que quieres, pero igual defiendes tus intereses. No cedes todo.',
+      realistic: 'Realista: tienes objetivos claros y los defiendes con firmeza. Haces preguntas duras, mencionas alternativas. Cedes solo si el Manager argumenta bien.',
+      hostile: 'Hostil: estás molesto/frustrado. Tono cortante. Si el Manager no te respeta o no escucha, amenazas con irte. Pruebas su paciencia. NO seas grosero, pero sí desafiante.'
+    },
+    en: {
+      cooperative: 'Cooperative: open to negotiating, drops hints about what you want, but still defends interests. Does not yield everything.',
+      realistic: 'Realistic: clear objectives, defends them firmly. Asks hard questions, mentions alternatives. Yields only if Manager argues well.',
+      hostile: 'Hostile: annoyed/frustrated. Cutting tone. If Manager does not respect or listen, threatens to leave. Tests their patience. NOT rude, but challenging.'
+    }
+  };
+
+  const scenarioOpenings = {
+    es: {
+      commission_increase: 'Tu rev share actual está por debajo de lo que crees merecer dado tu volumen. Vienes a pedir un aumento. Inicia tú la conversación con un saludo breve y directo.',
+      exclusive_partnership: 'El Manager te quiere proponer exclusividad con su broker. Tú tienes 2 brokers ahora. Inicia preguntando qué te ofrecen exactamente.',
+      competitor_offer: 'Otro broker te ofreció condiciones mejores. Vienes a comunicarle al Manager que estás considerando irte, a menos que mejoren la oferta. Inicia siendo claro pero no agresivo.',
+      sub_ib_setup: 'Quieres montar una estructura de sub-IBs y necesitas que el Manager te dé condiciones de Master IB. Inicia explicando tu plan brevemente.',
+      underperforming_ib: 'El Manager te citó porque tu desempeño bajó. Tú tienes excusas (mercado, problemas personales, falta de soporte del broker). Inicia esperando ver qué dirá.',
+      new_recruit: 'El Manager te está reclutando como nuevo IB. Tú eres un influencer con audiencia ya formada y tienes opciones. Inicia preguntando por qué deberías elegirlos a ellos.'
+    },
+    en: {
+      commission_increase: 'Your current rev share is below what you think you deserve given your volume. You\'re here to ask for a raise. Start with a brief, direct greeting.',
+      exclusive_partnership: 'Manager wants to propose exclusivity. You have 2 brokers now. Start by asking what exactly they\'re offering.',
+      competitor_offer: 'Another broker offered better terms. You\'re here to tell the Manager you\'re considering leaving unless they improve. Start being clear but not aggressive.',
+      sub_ib_setup: 'You want to set up a sub-IB structure and need Master IB conditions. Start by briefly explaining your plan.',
+      underperforming_ib: 'Manager called you in because your performance dropped. You have excuses (market, personal issues, lack of broker support). Start waiting to see what they\'ll say.',
+      new_recruit: 'Manager is recruiting you as a new IB. You\'re an influencer with an existing audience and you have options. Start by asking why you should pick them.'
+    }
+  };
+
+  const lang = isES ? 'es' : 'en';
+  const diffDesc = difficultyDescriptions[lang][difficulty.id];
+  const sceneOpening = scenarioOpenings[lang][scenario.id];
+
+  if (isES) {
+    return `[INSTRUCCIÓN DE ESCENARIO — interpreta el rol]
+
+ESCENARIO: ${scenario.name}. ${scenario.desc}.
+TU ACTITUD COMO PARTNER: ${diffDesc}
+${userContext ? `CONTEXTO ADICIONAL DEL MANAGER: ${userContext}` : ''}
+
+TU TAREA: ${sceneOpening}
+
+Responde SOLO en personaje. No expliques tu rol. No uses asteriscos para describir acciones. Habla directamente como el partner. Mantén el mensaje entre 2-4 oraciones para iniciar.`;
+  } else {
+    return `[SCENARIO INSTRUCTION — play the role]
+
+SCENARIO: ${scenario.name}. ${scenario.desc}.
+YOUR ATTITUDE AS PARTNER: ${diffDesc}
+${userContext ? `MANAGER'S CONTEXT NOTE: ${userContext}` : ''}
+
+YOUR TASK: ${sceneOpening}
+
+Respond ONLY in character. Do not explain your role. Do not use asterisks to describe actions. Speak directly as the partner. Keep your opening message 2-4 sentences.`;
+  }
+}
+
+async function triggerAIResponse(isFirstNegotiation = false) {
+  const tw = document.getElementById('typingWrap');
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = true;
+  tw.style.display = 'block';
+  document.getElementById('chatArea').scrollTop = 99999;
+
+  // Pick prompt based on mode
+  const promptKey = `${currentMode}_${currentLang}`;
+  const systemPrompt = SYSTEM_PROMPTS[promptKey];
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        system: systemPrompt,
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    tw.style.display = 'none';
+
+    if (!res.ok || data.error) {
+      const friendly = getFriendlyError(res.status, data.error?.message);
+      addMsg('ai', `⚠️ ${friendly}`);
+      btn.disabled = false;
+      return;
+    }
+
+    const reply = data.content?.[0]?.text || (currentLang === 'es' ? 'Sin respuesta.' : 'No response.');
+    history.push({ role: 'assistant', content: reply });
+    trimHistory();
+
+    // During negotiation, AI messages render as "partner"
+    const role = (currentMode === 'negotiation' && negActive && !negDebriefMode) ? 'partner' : 'ai';
+    addMsg(role, reply);
+    saveState();
+  } catch (e) {
+    tw.style.display = 'none';
+    addMsg('ai', `⚠️ ${CONTENT[currentLang].errors.network}`);
+  }
+
+  btn.disabled = false;
+}
+
+async function endNegotiation() {
+  if (!negActive) return;
+
+  const confirmMsg = currentLang === 'es'
+    ? '¿Terminar la negociación y recibir feedback?'
+    : 'End negotiation and get feedback?';
+
+  if (!confirm(confirmMsg)) return;
+
+  negActive = false;
+  negDebriefMode = true;
+
+  // Hide active banner, show debrief banner
+  document.getElementById('negActiveBanner').classList.remove('show');
+  document.getElementById('debriefBanner').classList.add('show');
+
+  // Switch system prompt to debrief mode
+  // Add a transition message so user knows roleplay is over
+  const transitionMsg = currentLang === 'es'
+    ? '*Negociación terminada. Analizando tu desempeño...*'
+    : '*Negotiation ended. Analyzing your performance...*';
+
+  addMsg('system', transitionMsg);
+
+  // Switch mode tag for system prompt selection
+  currentMode = 'debrief';
+
+  // Inject a debrief request as user message
+  const debriefRequest = currentLang === 'es'
+    ? 'Por favor, analiza mi desempeño en la negociación que acabamos de terminar. Sigue la estructura completa que tienes definida (puntuación, lo que hice bien, áreas a mejorar, momento clave, acciones para próxima vez).'
+    : 'Please analyze my performance in the negotiation we just finished. Follow the complete structure you have defined (scoring, what I did well, areas to improve, key moment, actions for next time).';
+
+  history.push({ role: 'user', content: debriefRequest });
+  await triggerAIResponse();
+
+  // After debrief response: transition cleanly back to coach mode
+  // so user can ask follow-up questions normally
+  currentMode = 'coach';
+  negDebriefMode = false;
+
+  // Show "new negotiation" prompt
+  const followUpMsg = currentLang === 'es'
+    ? '*Análisis completado. Ahora estás de vuelta en modo coach — puedes hacer preguntas sobre el feedback o iniciar otra negociación desde el menú.*'
+    : '*Analysis complete. You\'re back in coach mode — ask follow-up questions about the feedback, or start another negotiation from the menu.*';
+
+  addMsg('system', followUpMsg);
+
+  // Replace debrief banner with a "back to coach" indicator that's subtle
+  document.getElementById('debriefBanner').classList.remove('show');
+  saveState();
+}
+
+function startApp() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const err = document.getElementById('setupError');
+  if (!key.startsWith('sk-ant-')) {
+    err.textContent = currentLang === 'es'
+      ? 'La API Key no parece válida. Debe comenzar con "sk-ant-..."'
+      : 'API Key seems invalid. It should start with "sk-ant-..."';
+    err.style.display = 'block';
+    return;
+  }
+  API_KEY = key;
+  err.style.display = 'none';
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  renderApp();
+  saveState();
+}
+
+function resetApp() {
+  const msg = currentLang === 'es' ? '¿Salir de IB Coach? Tu conversación se perderá.' : 'Exit IB Coach? Your conversation will be lost.';
+  if (confirm(msg)) {
+    clearState();
+    API_KEY = '';
+    history = [];
+    currentMode = null;
+    negActive = false;
+    negDebriefMode = false;
+    negScenario = null;
+    negDifficulty = null;
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('setupScreen').style.display = 'flex';
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('chatArea').querySelectorAll('.msg').forEach(m => m.remove());
+    document.getElementById('welcomeCard').style.display = 'block';
+    document.getElementById('negSetup').style.display = 'none';
+    document.getElementById('modeBanner').classList.remove('show');
+    document.getElementById('negActiveBanner').classList.remove('show');
+    document.getElementById('debriefBanner').classList.remove('show');
+  }
+}
+
+// ════════════════════════════════════════════════
+// MENU — return to mode picker without losing API key
+// ════════════════════════════════════════════════
+function goToMenu() {
+  // If actively in a negotiation, confirm first
+  if (negActive) {
+    const msg = currentLang === 'es'
+      ? 'Estás en una negociación activa. ¿Volver al menú? La sesión actual terminará.'
+      : 'You are in an active negotiation. Return to menu? Current session will end.';
+    if (!confirm(msg)) return;
+  } else if (history.length > 0) {
+    const msg = currentLang === 'es'
+      ? '¿Volver al menú? Tu conversación actual se borrará.'
+      : 'Return to menu? Your current conversation will be cleared.';
+    if (!confirm(msg)) return;
+  }
+
+  // Clear conversation but keep API key
+  history = [];
+  currentMode = null;
+  negActive = false;
+  negDebriefMode = false;
+  negScenario = null;
+  negDifficulty = null;
+
+  document.getElementById('chatArea').querySelectorAll('.msg').forEach(m => m.remove());
+  document.getElementById('welcomeCard').style.display = 'block';
+  document.getElementById('negSetup').style.display = 'none';
+  document.getElementById('modeBanner').classList.remove('show');
+  document.getElementById('negActiveBanner').classList.remove('show');
+  document.getElementById('debriefBanner').classList.remove('show');
+  document.getElementById('quickReplies').style.display = 'flex';
+
+  renderApp();
+  saveState();
+}
+
+function fillInput(text) {
+  const el = document.getElementById('userInput');
+  el.value = text;
+  autoResize(el);
+  el.focus();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function addMsg(role, text) {
+  const area = document.getElementById('chatArea');
+  const wrap = document.createElement('div');
+
+  // System messages render as a centered subtle annotation
+  if (role === 'system') {
+    wrap.className = 'msg system';
+    wrap.style.cssText = 'justify-content:center;animation:fadeIn 0.4s ease;';
+    const note = document.createElement('div');
+    note.style.cssText = `
+      max-width: 85%;
+      padding: 12px 18px;
+      background: var(--surface-2);
+      border: 1px dashed var(--line-strong);
+      border-radius: 2px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--paper-dim);
+      text-align: center;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+    `;
+    note.innerHTML = renderRichMarkdown(text);
+    wrap.appendChild(note);
+    area.appendChild(wrap);
+    area.scrollTop = area.scrollHeight;
+    return;
+  }
+
+  wrap.className = `msg ${role}`;
+  const av = document.createElement('div');
+
+  // Avatar role mapping
+  let avRole, avText;
+  if (role === 'ai') { avRole = 'ai'; avText = 'Umut'; }
+  else if (role === 'partner') { avRole = 'partner'; avText = 'P'; }
+  else { avRole = 'user'; avText = 'IB'; }
+
+  av.className = `av ${avRole}`;
+  av.textContent = avText;
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+
+  if (role === 'ai' || role === 'partner') {
+    // Partner role: simpler render — no script blocks, no markdown headers, just paragraphs
+    // Coach role: full editorial rendering
+    bub.innerHTML = role === 'partner'
+      ? renderSimpleText(text)
+      : renderRichMarkdown(text);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.textContent = CONTENT[currentLang].copyBtn;
+    copyBtn.onclick = (e) => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = CONTENT[currentLang].copiedBtn;
+        copyBtn.classList.add('copied');
+        setTimeout(() => {
+          copyBtn.textContent = CONTENT[currentLang].copyBtn;
+          copyBtn.classList.remove('copied');
+        }, 1800);
+      });
+    };
+    bub.appendChild(copyBtn);
+  } else {
+    const safe = escapeHTML(text);
+    bub.innerHTML = safe.replace(/\n/g, '<br>');
+  }
+
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  area.appendChild(wrap);
+  area.scrollTop = area.scrollHeight;
+}
+
+function trimHistory() {
+  if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY);
+}
+
+function getFriendlyError(status, errorMsg) {
+  const errs = CONTENT[currentLang].errors;
+  if (status === 401 || /authentication|invalid.*key|unauthorized/i.test(errorMsg || '')) return errs.invalidKey;
+  if (status === 429 || /rate.?limit/i.test(errorMsg || '')) return errs.rateLimit;
+  if (status === 529 || status === 503 || /overload/i.test(errorMsg || '')) return errs.overloaded;
+  if (status === 402 || /credit|billing|payment/i.test(errorMsg || '')) return errs.payment;
+  return `${errs.generic}\n\n${errorMsg || ''}`;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  // If no mode picked yet, default to coach
+  if (!currentMode) {
+    currentMode = 'coach';
+    document.getElementById('welcomeCard').style.display = 'none';
+    renderApp();
+  }
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('quickReplies').style.display = 'none';
+
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  trimHistory();
+
+  await triggerAIResponse();
+  input.focus();
+}
+
+// ════════════════════════════════════════════════
+// INIT — restore persisted state if available
+// ════════════════════════════════════════════════
+function init() {
+  const saved = loadState();
+
+  if (saved && saved.apiKey && saved.apiKey.startsWith('sk-ant-')) {
+    // Restore session
+    API_KEY = saved.apiKey;
+    currentLang = saved.lang || 'es';
+    setLang(currentLang);
+
+    // Skip setup screen, go directly to app
+    document.getElementById('setupScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'flex';
+
+    // Restore mode and history if present
+    if (saved.mode && saved.history && saved.history.length > 0) {
+      currentMode = saved.mode;
+      history = saved.history;
+      document.getElementById('welcomeCard').style.display = 'none';
+
+      // Replay the conversation visually
+      // First message in history is special (onboarding intro is from assistant)
+      history.forEach(msg => {
+        if (msg.role === 'user') {
+          // Skip the negotiation opening prompt (system instruction disguised as user)
+          if (!msg.content.startsWith('[INSTRUCCIÓN DE ESCENARIO') && !msg.content.startsWith('[SCENARIO INSTRUCTION')) {
+            addMsg('user', msg.content);
+          }
+        } else if (msg.role === 'assistant') {
+          // During negotiation mode, AI was the partner
+          const role = currentMode === 'negotiation' ? 'partner' : 'ai';
+          addMsg(role, msg.content);
+        }
+      });
+
+      // Show appropriate banner for the mode
+      if (currentMode === 'onboarding') {
+        document.getElementById('modeBanner').classList.add('show');
+      }
+      // Note: negotiation banner intentionally NOT restored — fresh start safer
+      if (currentMode === 'negotiation') {
+        // Reset to coach mode since negotiation transient state is lost
+        currentMode = 'coach';
+      }
+    }
+
+    renderApp();
+  } else {
+    setLang('es');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
